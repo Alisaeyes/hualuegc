@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/user-center.css">
+    <script src="js/rem.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/storage.js"></script>
+    <style>
+        .section img{border-radius: 50%;border:0.04rem solid #fff;}
+    </style>
+</head>
+<body style="background: #fff;">
+<div class="header_wrap">
+    <a class="header_back" href="mycenter.html"></a>
+    <span class="user_name"></span>
+    <!-- <a class="edit">编辑</a> -->
+</div>
+<div class="section">
+    <img src="" style="width: 1.35rem;height: 1.35rem;">
+</div>
+    <section class="user_center_form">
+        <form>
+           <div class="user_center_a">
+                <span>昵称</span>
+                <input type="text" placeholder=""  disabled=true/>
+                <em></em>
+            </div>
+            <div class="user_center_a">
+                <span>性别</span>
+                <input type="text" placeholder=""  disabled=true/>
+                <em></em>
+            </div>
+            <div class="user_center_a">
+                <span>电话</span>
+                <input type="text" placeholder=""  disabled=true/>
+                <em></em>
+            </div>
+            <div class="user_center_a">
+                <span>生日</span>
+                <input type="text" placeholder=""  disabled=true/>
+                <em></em>
+            </div>
+            <div class="user_center_a">
+                <span>地区</span>
+                <input type="text" placeholder=""  disabled=true/>
+                <em></em>
+            </div>
+            <div class="user_center_a">
+                <span>部门</span>
+                <input type="text" placeholder="" disabled=true/;>
+                <em></em>
+            </div>
+        </form>
+        <input type="button" value="退出登录" class="c-btn" id="exit_btn"/>
+        <!-- window.location.href='login_1.html -->
+    </section>
+
+    <script>
+        var user_id = Stor.getItem("user_id");
+        if(user_id){
+            /*退出登录*/
+            $("#exit_btn").on("click",function(){
+                layer.open({
+                    content: '您确定要退出登录吗？'
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index){
+                        Stor.removeItem("user_id");
+                        layer.close(index);
+                        window.location.href='login_1.html';
+                    }
+                });
+            });
+
+            layer.open({
+                type: 2,
+                shadeClose: false,
+            });
+            /*获取用户信息*/
+            $.ajax({
+                url:baseUrl+"/api/member/getinfo",
+                type:"POST",
+                data:"data="+JSON.stringify({userId:user_id}),
+                datatype:"json",
+                success:function(data){
+                    layer.closeAll();
+                    switch (data.code) {
+                        case 100:
+                            $(".section img").attr("src",baseUrl+'/uploads/face/'+data.result.head_img);
+                            $(".user_name").text(data.result.nickname);
+                            $(".user_center_a").eq(0).find("input").val(data.result.nickname);
+                            $(".user_center_a").eq(1).find("input").val(data.result.sex==""||data.result.sex==null?"未知":(data.result.sex?"男":"女"));
+                            $(".user_center_a").eq(2).find("input").val(data.result.mobile);
+                            $(".user_center_a").eq(3).find("input").val(data.result.birthday);
+                            $(".user_center_a").eq(4).find("input").val(data.result.address);
+                            $(".user_center_a").eq(5).find("input").val(data.result.groupname);
+                            break;
+                        case -99:
+                            
+                            break;
+                    }
+                },
+                error:function(){
+                    layer.closeAll();
+                    layer.open({
+                        content:"网络错误",
+                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                        shade:false,
+                        time:0.8
+                    });
+                }
+            });
+    }else{
+        window.location.href="./login_1.html";
+    }
+    </script>
+</body>
+</html>

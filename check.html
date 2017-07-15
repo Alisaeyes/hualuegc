@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chorme=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<!-- 去除苹果手机的默认样式 -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<!-- 取消设备对手机号进行识别 -->
+<meta name="format-detection" content="telephone=no">
+<meta name="x5-orientation" content="portrait"/>
+<meta name="screen-orientation" content="portrait"/>
+<title>考勤</title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/check.css">
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=WyONuE81p41d5G62MVfKWscS94lFMjNx"></script>
+<script src="./js/jquery-3.2.1.min.js"></script>
+<script src="./js/rem.js"></script>
+<script src="./js/layer.js"></script>
+<script src="./js/storage.js"></script>
+</head>
+<body style="background:#fff;">
+	<div class="header">
+	    <div class="header_content_top">
+	        <span onClick="window.location.href='mycenter.html'"></span><em>考勤打卡</em><i>帮助</i>
+	    </div>
+	</div>
+	<section class="content_user">
+	    <img src="" style="width: 0.85rem;height: 0.85rem;">
+	    <div class="content_user_man">
+	        <p class="user_man"></p>
+	        <span class="user_con">考勤打卡</span>
+	    </div>
+	    <span class="user_date"></span>
+	</section>
+	    <div class="clearfix">
+	<div class="section_con">
+	    <section class="section_content_line">
+	        <div class="section_box1"><p>上</p></div>
+	        <div class="section_line"></div>
+	        <div class="section_box2"><p>下</p></div>
+	    </section>
+	<section class="section_content_go tip-msg">
+	        <ul>
+	            <li class="section_page1">打卡时间<span class="tap-time"></span>（上班时间09:00）</li>
+	            <li class="section_page2"></li>
+	            <li class="section_page3"><a href="">更新打卡&gt;</a></li>
+	        </ul>
+	</section>
+	<section class="section_content_next tip-msg">
+	        <ul>
+	            <li class="section_page1">打卡时间<span class="tap-time"></span>（下班时间18:00）</li>
+	            <li class="section_page4"></li>
+	            <li class="section_page3"><a href="">申请补卡&gt;</a></li>
+	        </ul>
+	</section>
+	</div>
+	</div>
+	<div class="section_content_last">
+	    <div class="section_last_page" id="saveTime">
+	        <p class="tipWord" style="margin-top: 0;padding-top: 0.8rem;">上班打卡</p>
+	        <p class="time" style="margin-top: 0;padding-top: 0;"></p>
+	    </div>
+	    <p class="tip">
+	        <img src="images/daka_11.png" style="width:0.3rem;height: 0.3rem;vertical-align: middle; ">
+	        &nbsp;<span>已经入考勤范围</span>
+	    </p>
+	</div>
+	<div style="display: none;" id="allmap"></div>
+
+</body>
+
+
+<script>
+    var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+
+	/*加载用户信息*/
+	$.ajax({
+		url:baseUrl+"/api/member/getinfo",
+		type:"POST",
+		dataType:"json",
+		data:"data="+JSON.stringify({userId:Stor.getItem("user_id")}),
+		success:function(data){
+			$(".content_user img").attr("src",baseUrl+'/uploads/face/'+data.result.head_img);
+			$(".user_man").text(data.result.contact);
+		},
+		error:function(jqxhr){
+	           layer.closeAll();
+	           layer.open({
+	                  content:"网络错误",
+	                  style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+	                  shade:false,
+	                  time:0.8,
+	           });
+	      }
+	})
+
+
+	var timeBox 		=  	$("#saveTime"),
+		tipBox 	 		= 	$(".tip-msg"),
+		statusGo		= 	$(".section_page2"),
+		statusNext		= 	$(".section_page4"),
+		timeGo 			= 	$(".section_content_go").find(".tap-time"),
+		timeNext 		= 	$(".section_content_next").find(".tap-time");
+	//设置按钮样式
+	if(parseInt(Stor.getItem("status"))>=2){
+		tipBox.css({"display":"block"});
+		statusGo.text(Stor.getItem("statusGo"));
+		statusGo.addClass(Stor.getItem("classGo"));
+		timeGo.text(Stor.getItem("timeGo"));
+		statusNext.text(Stor.getItem("statusNext"));
+		statusNext.addClass(Stor.getItem("classNext"));
+		timeNext.text(Stor.getItem("timeNext"));
+		timeBox.css({"backgroundColor":"#ddd"});
+		timeBox.find('.tipWord').text('下班打卡');	
+		console.log(1)
+	}
+
+
+	/*到第二天恢复页面数据*/
+	var today = parseInt((""+(new Date().getMonth()+1)+addZero(new Date().getDate())));
+	if(parseInt(Stor.getItem("day"))<today){
+		timeBox.css({"backgroundColor":"#00b9ff"});
+		timeBox.find('.tipWord').text('上班打卡');
+		tipBox.css({"display":"none"});
+	}
+	console.log(today)
+
+/*打卡控制*/
+timeBox.click(function(event) {
+	//获取当前地址
+	var location = {};
+	var map = new BMap.Map("allmap");
+	var point = new BMap.Point(114.326088,30.577557);
+	map.centerAndZoom(point,5);
+	var geolocation = new BMap.Geolocation();
+
+	geolocation.getCurrentPosition(function(r){
+	        if(this.getStatus() == BMAP_STATUS_SUCCESS){
+	            var pos = document.createElement("script");
+	            var lat = r.point.lat;
+	            var lng  = r.point.lng;
+	            $.ajax({
+	            		url:"http://api.map.baidu.com/geocoder/v2/",
+	            		data:{
+	            			ak:"fADRRrywrspQvkxUZGtaYZGN6RuNfNGi",
+	            			location:lat+","+lng,
+	            			output:"json",
+	            			pois:"1",
+	            			ret_coordtype:"bd09mc"
+	            		},
+	            		dataType:"jsonp",
+	            		jsonp:"callback",
+	            		success:function(data){
+	            			postData(data.result.location.lat,data.result.location.lng,data.result.formatted_address);
+	            		}
+	            });
+	        } else {
+	            alert('failed'+this.getStatus());
+	        }        
+	    },{ enableHighAccuracy: true });
+
+
+
+function postData(x,y,address){
+	//判断上下班打卡记录
+	var day = time.d;
+	var d = Stor.getItem("day");
+	if(parseInt(d)<day){
+       	Stor.setItem("status",0);
+       	Stor.removeItem("state");
+       };
+	var state= Stor.getItem("state");
+	var status = Stor.getItem("status");
+
+       var workTime = {
+            startTime:9,
+            endTime:18
+       };
+       var pdata = {
+	       			"userId":Stor.getItem("user_id"),
+	       			"worktime":new Date().getTime(),		//时间是有问题，不应该以客户端时间为准
+	       			"lat":x,
+	       			"lng":y,
+	       			"address":address
+	}
+       status =status||status=="0"?parseInt(status):0;
+       status++;
+       Stor.setItem("status",status);
+      if(status<3){
+	       if(!state){
+	       	if(time.h<=workTime.startTime){
+	       		statusGo.text('正常');
+	       		Stor.setItem("statusGo","正常");
+	       		statusGo.addClass('status-success');
+	       		Stor.setItem("classGo","status-success");
+	       	}else{
+	       		statusGo.text('迟到');
+	       		Stor.setItem("statusGo","迟到");
+	       		statusGo.addClass('status-warn');
+	       		Stor.setItem("classGo","status-warn");
+	       	}
+	       	Stor.setItem("state","off");
+	       	$.ajax({
+	       		type:"POST",
+	       		url:baseUrl+"/api/worktime/saveTime",
+	       		dataType:"json",
+	       		data:"data="+JSON.stringify(pdata),
+	       		success:function(result){
+	       			if(result.code==100){
+	       				layer.open({
+			       			content:result.msg,
+			       			skin:"msg",
+			       			time:2
+			       		})
+	       			}else if(result.code=="-99"){
+	       				layer.open({
+			       			content:result.msg,
+			       			skin:"msg",
+			       			time:2
+			       		})
+	       			}else if(result.code=="-1"){
+	       				layer.open({
+			       			content:result.msg,
+			       			skin:"msg",
+			       			time:2
+			       		})
+	       			}
+	       		},
+	       		error:function(xhr){
+	       			console.log(xhr.getStatus)
+	       		}
+	       	})
+	       	$(".section_content_go").css({"display":"block"});
+	       	timeGo.text(time.h+":"+time.m);
+	       	Stor.setItem("timeGo",time.h+":"+time.m);
+	       	$(".tipWord").text("下班打卡");
+	       }else if(state=="off"||state=="x"){
+	       	if(time.h>=workTime.endTime){
+	       		$.ajax({
+		       		type:"POST",
+		       		url:baseUrl+"/api/worktime/saveTime",
+		       		dataType:"json",
+		       		data:"data="+JSON.stringify(pdata),
+		       		success:function(result){
+		       			if(result.code==100){
+		       				layer.open({
+				       			content:result.msg,
+				       			skin:"msg",
+				       			time:2
+				       		})
+		       			}else if(result.code=="-99"){
+		       				layer.open({
+				       			content:result.msg,
+				       			skin:"msg",
+				       			time:2
+				       		})
+		       			}else if(result.code=="-1"){
+		       				layer.open({
+				       			content:result.msg,
+				       			skin:"msg",
+				       			time:2
+				       		})
+		       			}
+		       		},
+		       		error:function(xhr){
+		       			console.log(xhr.getStatus)
+		       		}
+		       	})
+		       	$(".section_content_next").css({"display":"block"});
+		       	statusNext.text('正常');
+		       	Stor.setItem("statusNext","正常");
+	       		statusNext.removeClass('status-success');	
+	       		Stor.setItem("classNext","status-success");
+	       		timeBox.css({"backgroundColor":"#ddd"});
+				timeBox.find('.tipWord').text('下班打卡');
+	       		timeNext.text(time.h+":"+time.m);
+	       		Stor.setItem("timeNext",time.h+":"+time.m);
+	       	}else{
+				layer.open({
+					btn:["确认","取消"],
+					content:"确认要早退",
+					yes:function(){
+						layer.closeAll();
+						$.ajax({
+				       		type:"POST",
+				       		url:baseUrl+"api/worktime/saveTime",
+				       		dataType:"json",
+				       		data:"data="+JSON.stringify(pdata),
+				       		success:function(result){
+				       			if(result.code==100){
+				       				layer.open({
+						       			content:result.msg,
+						       			skin:"msg",
+						       			time:2
+						       		})
+				       			}else if(result.code=="-99"){
+				       				layer.open({
+						       			content:result.msg,
+						       			skin:"msg",
+						       			time:2
+						       		})
+				       			}else if(result.code=="-1"){
+				       				layer.open({
+						       			content:result.msg,
+						       			skin:"msg",
+						       			time:2
+						       		})
+				       			}
+				       		},
+				       		error:function(xhr){
+				       			console.log(xhr.getStatus)
+				       		}
+				       	});
+						$(".section_content_next").css({"display":"block"});
+						statusNext.text('早退');
+						Stor.setItem("statusNext","早退");
+						statusNext.addClass('status-warn');
+						Stor.setItem("classNext","status-warn");
+						timeBox.css({"backgroundColor":"#ddd"});
+						timeBox.find('.tipWord').text('下班打卡');
+	       				timeNext.text(time.h+":"+time.m);
+	       				Stor.setItem("timeNext",time.h+":"+time.m);
+					},
+					no:function(){
+						layer.open({
+							content:"取消成功",
+							skin:"msg",
+							time:2
+						});
+						 Stor.setItem("status",1);
+					}
+				})
+				
+	       	}
+	       }
+       	Stor.setItem("day",day++);
+     }else{
+	     	layer.open({
+	     		content : '下班卡已经打了哟',
+	     		skin:"msg",
+	     		time:2
+	     	})
+     }
+}
+	 
+});
+
+	/*获取当前时间*/      
+	function getTime(){
+		var date = new Date();
+		var month = date.getMonth()+1;
+		var day = date.getDate();
+		var hours = addZero(date.getHours());
+		var minutes =addZero(date.getMinutes());
+		var seconds = addZero(date.getSeconds());
+		$(".time").text(hours+":"+minutes+":"+seconds);
+		$(".user_date").text(date.getFullYear()+"."+addZero(month)+"."+addZero(day));
+		if(hours>18){
+				Stor.setItem("state","x");
+		}
+		if(hours>9&&hours<18&&minutes>=0){
+		      $(".tip").show();
+		}else{
+		      $(".tip").hide();
+		}
+		 return {
+		      h:hours,
+		      m:minutes,
+		      d:""+month+day
+		  }
+	}
+	getTime();
+
+	var time =null;
+	setInterval(function(){
+		time= getTime();
+	    return time;
+	},900);
+
+	/*时间补零*/
+	function addZero(time){
+	    if(time<10){
+	        return "0"+time;
+	    }else{
+	        return time;
+	    }
+	}
+</script>
+</html>

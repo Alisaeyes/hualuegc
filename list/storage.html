@@ -1,0 +1,224 @@
+<html lang="en" data-dpr="1" style="font-size: 50px;"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="screen-orientation" content="portrait">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/doc.css">
+    <link rel="stylesheet" href="../css/list.css">
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/layer.js"></script>
+    <script src="../js/rem.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/fileUpload.js"></script>
+    <style>
+        .layui-m-anim-scale .layui-m-layercont{padding: 0;height: 100%;line-height: 0.8rem;}
+    </style>
+</head>
+<body style="font-size: 12px;">
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='goods-list.html'"></span><em>物品入库</em><i>关闭</i>
+    </div>
+</div>
+<section class="doc_form">
+        <div class="doc_01">
+            <span>物品名称</span>
+            <input type="text" name="name" placeholder="请输入物品名称">
+            <em></em>
+        </div>
+        <div class="doc_01" style="height: 1rem">
+            <span>物品分类</span>
+            <select name="cate_id" class="select_type fr">
+                <option value="">--请选择分类--</option>
+            </select>
+            <em></em>
+        </div>
+        <div class="doc_01">
+            <span>物品数量</span>
+            <input type="number" name="num" placeholder="请输入入库数量">
+            <em></em>
+        </div>
+        <div class="doc_01">
+            <span>物品价格</span>
+            <input type="number" name="price" placeholder="请输入入库价格">
+            <em></em>
+        </div>
+        <div class="doc_01 doc_03 border_bottom">
+            <span>入库详细</span>
+            <textarea class="txtcenter" name="backinfo" placeholder="请输入入库备注信息"></textarea>
+        </div>
+   
+        <div class="doc_01 border_bottom mt">
+                <span>物品照片</span>
+                <b>上传物品照片</b>
+                <input class="img-src" name="contractImg" type="hidden">
+                <div id="imgUploadContent" class="fileUploadContent"></div>
+         </div>
+        
+        <div class="doc_05 btn-mt">
+            <input type="button" class="sub_detail" value="提交"  id="submit_btn">
+        </div>
+    <script>
+        var user_id = Stor.getItem("user_id");
+        if(user_id){
+            $("#user").val(user_id);
+            layer.open({
+                type: 2,
+                shadeClose: false,
+            });
+
+            $.ajax({
+                url:baseUrl+"/api/asset/getassetcate",
+                type:"POST",
+                datatype:"JSON",
+                success:function(data){
+                    layer.closeAll();
+                    var code = null;
+                    var name = null;
+                    var id = null;
+                    var html = '';
+                    switch (data.code) {
+                        case 100:
+                            for(var i = 0;i<data.result.length;i++){
+                                code = data.result[i].code;
+                                name = data.result[i].cate;
+                                id = data.result[i].id;
+                                html += '<option code="'+code+'" value="'+id+'">'+name+'</option>'
+                            }
+                            $(".select_type").append(html);
+
+                            //上传文件实例化
+                            var imgSrc = [];
+                            $("#imgUploadContent").initUpload({
+                                "uploadId":"imgUploadContent",
+                                "uploadUrl":baseUrl+"/api/upload/uploadContract",
+                                "showSummerProgress":false,
+                                //"size":350,
+                                //"maxFileNumber":3,
+                                //"filelSavePath":"",//文件上传地址，后台设置的根目录
+                                "beforeUpload":function (opt){
+                                    //opt.otherData =[{"name":"你要上传的参数","value":"你要上传的值"}];
+                                },
+                                "onUpload":function(opt,data){
+                                    imgSrc.push(data);
+                                    $(".img-src").val(imgSrc.join(","));
+
+                                    // console.log($(".img-src").val())
+                                    uploadTools.uploadError(opt);//显示上传错误
+                                },
+                                autoCommit:true,
+                                "fileType":['png','jpg','gif','PNG','JPG','GIF']
+                            });
+
+                            $("#submit_btn").on("click",function(){ 
+                                var name = document.getElementsByName("name")[0].value;
+                                var type = document.getElementsByName("cate_id")[0].value;
+                                var number = document.getElementsByName("num")[0].value;
+                                var money = document.getElementsByName("price")[0].value;
+                                var details = document.getElementsByName("backinfo")[0].value;
+                                var pic = document.getElementsByName("contractImg")[0].value;
+                                if(name==""){
+                                     layer.open({
+                                        content:"请输入物品名称",
+                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                        shade:false,
+                                        time:0.8
+                                    });
+                                    return false;
+                                }else if(type==""){
+                                    layer.open({
+                                        content:"请选择物品分类",
+                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                        shade:false,
+                                        time:0.8
+                                    });
+                                    return false;
+                                }else if(number==""){
+                                    layer.open({
+                                        content:"请输入物品数量",
+                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                        shade:false,
+                                        time:0.8
+                                    });
+                                    return false;
+                                }else if(money==""){
+                                    layer.open({
+                                        content:"请输入物品价格",
+                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                        shade:false,
+                                        time:0.8
+                                    }); 
+                                    return false;
+                                }
+                                if(name!=""&&type!=""&&number!=""&&money!=""){
+                                    layer.open({
+                                        type: 2,
+                                        shadeClose: false,
+                                    });
+                                    $.ajax({
+                                        url:baseUrl+"/api/asset/index",
+                                        type:"POST",
+                                        datatype:"JSON",
+                                        data:"data="+JSON.stringify({"userId":user_id,"name":name,"type":0,"num":number,"price":money,"backinfo":details,"cate_id":type,"pic":pic}),
+                                        success:function(data){
+                                            layer.closeAll();
+                                            switch (data.code) {
+                                                case 100:
+                                                     layer.open({
+                                                        content:"入库成功",
+                                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                                        shade:false,
+                                                        time:0.8
+                                                    });
+                                                    break;
+                                                case -1:
+                                                    layer.open({
+                                                        content:"入库失败",
+                                                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;height:0.8rem;line-height:0.8rem;',
+                                                        shade:false,
+                                                        time:0.8
+                                                    });
+                                                    break;
+                                            }
+                                        },
+                                        error:function(){
+                                            layer.closeAll();
+                                            layer.open({
+                                                content:"网络错误",
+                                                style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                                shade:false,
+                                                time:0.8
+                                            });
+                                        }
+                                    });
+                                };
+                               
+                            });
+                            break;
+                        default:
+                            // statements_def
+                            break;
+                    }
+                },
+                error:function(){
+                    layer.closeAll();
+                    layer.open({
+                        content:"网络错误",
+                        style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                        shade:false,
+                        time:0.8
+                    });
+                }
+            });    
+        }
+    </script>
+</body>
+</html>

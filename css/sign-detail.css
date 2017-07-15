@@ -1,0 +1,21 @@
+
+.sign_detail_01 {  border-top: 0.01rem solid #dddddd; border-bottom: 0.01rem solid #dddddd; padding: 0.3rem 1rem 0.3rem 0.8rem; background: #fff; }
+.sign_detail_01 p { font-size: 0.3rem; line-height: 0.48rem; position: relative; }
+.sign_detail_01 p:before { content: ""; width: 0.32rem; height: 0.42rem; background: url(../images/detail_01.png) no-repeat; background-size: 100% auto; position: absolute; left: -0.5rem; top: 0.06rem; }
+.sign_detail_02 { background: #fff; border-bottom: 0.01rem solid #dddddd; }
+.sign_detail_02 p { line-height: 0.84rem; padding: 0 0.28rem; font-size: 0.3rem; color: #666666; }
+.sign_detail_02 p span { color: #333; margin-left: 0.2rem; margin-right: 0.34rem; }
+.sign_detail_02 p em { color: #333; }
+.sign_detail_03 { padding: 0.3rem; background: #fff; margin: 0.12rem 0; border-top: 0.01rem solid #dddddd; border-bottom: 0.01rem solid #dddddd; }
+.sign_detail_03 input { outline: none; border: none; background: none; margin-left: 1.1rem; }
+.sign_detail_03 img { width: 1rem; height: 1rem; margin-top: 0.5rem; }
+.sign_detail_03_content span{font-size: 0.32rem;}
+.sign_detail_04 { padding: 0.3rem; background: #fff; border-bottom: 0.01rem solid #dddddd; border-top: 0.01rem solid #dddddd; }
+.sign_detail_04_r { margin-top: 0.3rem; line-height: 0.4rem; position: relative; }
+.sign_detail_04_r label { margin-left: 0.32rem; font-size: 0.3rem; }
+.sign_detail_04 p{font-size: 0.3rem;}
+.sign_detail_04_r input { width: 0.4rem; height: 0.4rem; vertical-align: top; }
+.sign_detail_04_r span { position: absolute; width: 0.4rem; height: 0.4rem; background: #fff url(../images/detail_02.png) no-repeat; left: 0; top: 0; background-size: 100% 100%; display: none; z-index: 1; }
+.sign_detail_04_r em:hover span { display: block; }
+.sub_detail { width: 6.5rem; display: block; margin: 0.48rem auto 1rem; background: #0094ff; height: 0.8rem; line-height: 0.8rem; color: #fff; text-align: center; font-size: 0.36rem; border-radius: 0.2rem;}
+

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>工作</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<!-- 去除苹果手机的默认样式 -->
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<!-- 取消设备对手机号进行识别 -->
+	<meta name="format-detection" content="telephone=no">
+	<meta name="x5-orientation" content="portrait"/>
+	<meta name="screen-orientation" content="portrait"/>
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/index.css">
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" href="css/swiper.min.css">
+	<script src="js/rem.js"></script>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/storage.js"></script>
+	<script src="js/layer.js"></script>
+	<script src="js/index.js"></script>
+</head>
+<body style="background: #fff;">
+<header class="header">
+	<h2>工作</h2>
+</header>
+<div class="content-wrap">
+	<!--banner start-->
+	<div class="swiper-container">
+		<div class="swiper-wrapper">
+			<div class="swiper-slide"><a href=""><img src="images/index_02.png" alt=""></a></div>
+			<div class="swiper-slide"><a href=""><img src="images/index_02.png" alt=""></a></div>
+			<div class="swiper-slide"><a href=""><img src="images/index_02.png" alt=""></a></div>
+		</div>
+		<div class="swiper-pagination">
+			<span class="swiper-pagination-bullet-active"></span>
+			<span class="swiper-pagination-bullet"></span>
+			<span class="swiper-pagination-bullet"></span>
+		</div>
+		<div class="nav_page">
+			<p>更高效的办公方式</p>
+			<span>签字审批不用一等再等</span>
+		</div>
+	</div>
+
+	<!--banner end-->
+	<!--main start-->
+	<div class="section_index">
+		<div class="section_page">
+			<p>常规应用</p>
+		</div>
+	</div>
+	<div class="section_content  section_content_a">
+		<div>
+			<a href="list/project.html"><img src="images/index_07.png" />
+			<p>项目任务</p></a>
+		</div>
+		<div>
+			<a href="list/my-task.html"><img src="images/index_07.png" />
+			<p>我的任务</p></a>
+		</div>
+		
+		<!-- <div>
+			<a href="sign.html"><img src="images/index_05.png" />
+			<p>签到</p>
+			</a>
+		</div>
+		<div>
+			<a href="contract-management.html"><img src="images/index_07.png" />
+			<p>合同管理</p></a>
+		</div>
+		
+		<div><a href="doc.html"><img src="images/index_09.png" />
+			<p>请假</p></a>
+		</div>
+		<div><a href=""><img src="images/index_11.png" />
+			<p>外出</p></a>
+		</div>
+		<div><a href=""><img src="images/index_17.png" />
+			<p>报销</p></a>
+		</div>
+		<div><a href="approve.html"><img src="images/index_18.png" />
+			<p>审批</p></a>
+		</div>
+		<div><a href=""><img src="images/index_19.png" />
+			<p>会议</p></a>
+		</div> -->
+		<!-- <div><a href=""><img src="images/index_20.png" />
+			<p>添加</p></a>
+		</div> -->
+	</div>
+	<div class="section_index">
+		<div class="section_page"><p>其他应用</p></div>
+	</div>
+	<div class="section_content">
+		<div>
+			<a href=""><img src="images/index_25.png"/>
+			<p>日志</p></a>
+		</div>
+		<div>
+			<a href=""><img src="images/index_26.png"/>
+			<p>工作汇报</p></a>
+		</div>
+		<div>
+			<a href="list/goods-list.html"><img src="images/index_27.png"/>
+			<p>物品操作</p></a>
+		</div>
+	<!-- 	<div>
+		<a href=""><img src="images/index_28.png"/>
+		<p>添加</p></a>
+	</div> -->
+	</div>
+</div>
+<!--main end-->
+<!--footer-->
+<div class="footer">
+    <div onclick="location.href='./message.html'">
+            <i class="iconfont">&#xe656;</i>
+            <p>消息</p>
+            <span class="msgTip"></span>
+    </div>
+    <div onclick="location.href='./index.html'"  class="active">
+            <i class="iconfont">&#xe612;</i>
+            <p>工作</p>
+    </div>
+     <div onclick="location.href='./address.html'">
+            <i class="iconfont">&#xe623;</i>
+            <p>通讯录</p>
+    </div>
+    <div onclick="location.href='./mycenter.html'">
+            <i class="iconfont">&#xe653;</i>
+            <p>我的</p>
+    </div>
+</div>
+<!--footer end-->
+<script src="js/swiper-3.3.1.jquery.min.js"></script>
+<script>
+	var swiper = new Swiper('.swiper-container', {
+		pagination: '.swiper-pagination',
+		paginationClickable: true,
+		loop:true,
+		autoplay:3000
+	});
+
+	layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+	var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+    if(user_id){
+    	$.ajax({
+    	"url": baseUrl+'/api/program/showPrograms',
+            "type": 'POST',
+            "dataType": 'JSON',
+            "data":"data="+JSON.stringify({"userId":user_id}),
+            success:function(data){
+            	layer.closeAll();
+            	var name  = '';
+            	var id = "";
+            	var pic = "";
+            	var html = "";
+
+            	if(data.code==100){
+            		for(var i =0;i<data.result.length;i++){
+            			name = data.result[i].name;
+            			id = data.result[i].id;
+            			pic = data.result[i].pic;
+
+            			html += '<div>'+
+							'<a href="./list-details.html?pid='+id+'"><img src="images/index_07.png" />'+
+							'<p>'+name+'</p></a>'+
+						'</div>';
+            		};
+            		$(".section_content_a").append(html);
+            	}else{
+	            	tip("数据加载失败");
+            	}
+            },
+            error:function(){
+            	layer.closeAll();
+                tip("请求出错");
+            }
+    	});
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/doc.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/touchTouch.css">
+    <link rel="stylesheet" href="../css/message.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link href="../css/iconfont.css" rel="stylesheet" type="text/css"/>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/layer.js"></script>
+    <script src="../js/rem.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/touchTouch.jquery.js"></script>
+    <style>
+        .time-state{width: 0.1rem;background:#e4e4e4;margin:0.3rem 0 0 0.3rem;padding: 1rem 0;}
+        .time-state li .state-d{width: 0.25rem;height: 0.25rem;background: rgba(0, 0, 0,.1);border-radius: 50%;margin-left: -0.075rem;}
+        .state-details{width: 6.5rem;margin-top: -0.24rem;margin-left: -0.08rem;margin-bottom: 1rem;}
+        .state-x{width: 1rem;height: 0.04rem;background: rgba(0, 0, 0,.1);margin-top: 0.11rem;margin-left: 0.25rem;}
+        .state-details.on .state-x,.time-state li .state-d.on{background:rgba(57,173,255,.5);}
+        .state-details.on{color:#39adff;}
+        .state-msg{width: 5rem;font-size:0.25rem;margin-top: -0.18rem;}
+        .state-msg span{padding:0 0.2rem;}
+        .state-msg button{width: 1.5rem;height: 0.5rem;border: none;color:#fff;background:#39adff;border-radius:0.05rem;}
+        .view-msg{margin-top: 0.2rem;}
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="href()"></span><em></em>
+    </div>
+</div>
+<div class="message-content msg-content">
+    <div class="content-lists"></div>
+    <div class="state-lists">
+    </div>
+</div>
+<script>
+    var user_id = Stor.getItem("user_id"); 
+    var nid = getUrlValue("nid");
+    var proid = getUrlValue("proid");
+    var pid = getUrlValue("pid");
+    var title = decodeURIComponent(getUrlValue("title"));
+    var status = getUrlValue("status");
+    $(".header_content_top em").text(title+"详情");
+    
+    loading();
+    $.ajax({
+        url:baseUrl+"/api/program/getDetail",
+        type:"POST",
+        dataType:"JSON",
+        data:"data="+JSON.stringify({"userId":user_id,"proid":proid,"nid":nid}),
+        success:function(data){
+            console.log(data)
+            layer.closeAll();
+            var html = "";
+            var img = "";
+            var file = "";
+            switch (data.code) {
+                case 100:
+                    var timeLength = 0;
+                    for(var i = 0;i<data.result.content.length;i++){
+                        switch(data.result.content[i].type){
+                            case "text":
+                                if(!data.result.content[i].value)break;
+                                html += '<div class="doc_01">'+
+                                            '<span>'+(data.result.content[i].need==1?"<strong>*</strong>":"")+data.result.content[i].title+'</span>'+
+                                            '<input type="'+data.result.content[i].type+'" readonly="readonly" need="'+data.result.content[i].need+'" name="'+data.result.content[i].fnid+'" value="'+data.result.content[i].value+'"/>'+
+                                        '</div>'
+                                break;
+                            case "datetime":
+                                if(!data.result.content[i].value)break;
+                                timeLength++;
+                                html+='<div class="doc_01">'+
+                                            '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                            '<input type="text" readonly="readonly" class="datepicker datepicker'+timeLength+'" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" value="'+formatDate(parseInt(data.result.content[i].value))+'"/>'+
+                                        '</div>'
+                                break;
+                            case "number":
+                                    if(!data.result.content[i].value)break;
+                                    html += '<div class="doc_01">'+
+                                            '<span>'+(data.result.content[i].need?"<strong>*</strong>":"")+data.result.content[i].title+'</span>'+
+                                            '<input type="'+data.result.content[i].type+'" need="'+data.result.content[i].need+'" name="'+data.result.content[i].fnid+'" readonly="readonly" placeholder="'+data.result.content[i].comment+'" value="'+data.result.content[i].value+'"/>'+
+                                        '</div>'
+                                    break;
+                            case "decimal":
+                                if(!data.result.content[i].value)break;
+                                html+='<div class="doc_01">'+
+                                            '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                            '<input type="number" readonly="readonly" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" value="'+data.result.content[i].value+'"/>'+
+                                        '</div>'
+                                break;
+                            case "image":
+                                if(!data.result.content[i].value)break;
+                                data.result.content[i].value.split(",").forEach(function(value,i){
+                                    img +='<li class="fl"><a href="'+baseUrl+"/uploads/contract/"+value+'"><img src="'+baseUrl+"/uploads/contract/"+value+'"/></a></li>'
+                                });
+                                html+='<div class="doc_01 border_bottom mt">'+
+                                                '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                                '<ul class="imgs img-view clearfix">'+img+'</ul>'+
+                                                '<input type="hidden" readonly="readonly" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" class="img-src">'+
+                                            '</div>';
+                                break;
+                            case "textarea":
+                                if(!data.result.content[i].value)break;
+                                html += '<div class="doc_01 doc_03 border_bottom">'+
+                                            '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                            '<textarea class="txtcenter" readonly="readonly" need="'+data.result.content[i].need+'" name="'+data.result.content[i].fnid+'">'+data.result.content[i].value+'</textarea>'+
+                                        '</div>'
+                                break;
+                            case "file":
+                                if(!data.result.content[i].value)break;
+                                data.result.content[i].value.split(",").forEach(function(value,i){
+                                    file +='<a class="fl enclosures" href="'+baseUrl+'/uploads/contract/'+value+'"><t>附件'+(i+1)+'</t></a>'
+                                });
+                                html+='<div class="doc_01 border_bottom mt">'+
+                                                '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                                '<div class="imgs clearfix" style="margin-left:-0.2rem;">'+file+'</div>'+
+                                                '<input type="hidden" readonly="readonly" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" class="file-src">'+
+                                            '</div>';
+                                break;
+                        }
+                    };
+
+                    var stateListContent = "";
+                    var stateList = $("<ul class='time-state'></ul>");
+                    var stateTime = [];
+                    var proId = "";
+                    data.result.turn.forEach(function(item,i){
+                            stateListContent += '<li>'+
+                                                    '<div class="state-d"></div>'+
+                                                    '<div class="state-details clearfix">'+
+                                                        '<div class="state-x fl"></div>'+
+                                                        '<div class="state-msg fr">'+
+                                                            '<p>'+formatDate(item.create_time)+'</p>'+
+                                                            '<b>'+(item.contact==null?"":"审批人："+item.contact)+'</b>'+
+                                                            (item.type==1?'<span style="color: #999;padding-left:0;">新建待审</span>':(item.type==2?'<span style="color: green">审核通过</span>':(item.type==3?'<span style="color: red">驳回</span>':(item.type==4?'<span style="color: #999;padding-left:0;">修改待审</span>':'<span style="color: #999;padding-left:0;">已撤销</span>'))))+
+                                                            '<button class="view-bz">查看备注</button>'+
+                                                            '<div class="view-msg" style="display:none">'+
+                                                                item.backinfo+
+                                                            '</div>'+
+                                                        '</div>'+
+                                                    '</div>'+
+                                                '</li>';
+                            proId = item.proid;
+                           stateTime.push(item.create_time);
+                    });
+                    
+
+                    html += '<div class="doc_05 btn-mt msg-btns clearfix" style="display:'+(status==2||status==4?"none;":"block")+'" >'+
+                                '<input class="fl adopt" type="button" value="修改" onclick="location.href=\'../list-details.html?pid='+pid+'&proid='+proId+'&nid='+nid+'&title='+title+'\'"><input class="fl reject" type="button" value="撤销">'+
+                            '</div>';
+
+                    $(".content-lists").append(html);
+                    // 图片查看
+                    $(".img-view a").touchTouch();
+
+
+                    stateList.append(stateListContent);
+                    $(".state-lists").append(stateList);
+                    
+                    /*控制当前状态显示*/
+                    $(".state-lists").find("li").each(function(){
+                        if($(this).find("p").text()==formatDate(stateTime[stateTime.length-1])){
+                            $(this).find(".state-d").addClass('on').parent().siblings().find(".state-d").removeClass('on');
+                            $(this).find(".state-details").addClass('on').parent().siblings().find(".state-details").removeClass('on');
+                        }
+                    });
+
+                    // 备注的显示隐藏
+                    $(".view-bz").attr("isShow",1);
+                    $(".view-bz").on("click",function(){
+                        if(parseInt($(this).attr("isShow"))){
+                            $(this).siblings(".view-msg").fadeIn(300);
+                            $(this).attr("isShow",0);
+                        }else{
+                            $(this).siblings(".view-msg").fadeOut(300);
+                            $(this).attr("isShow",1);
+                        }
+                    });
+
+                    /*撤销*/
+                    $(".reject").on("click",function(){
+                        var postDatas = {
+                            "userId":user_id,
+                            "nid":nid,
+                            "proid":proid,
+                            "type":3,
+                        }
+                        loading();
+                        $.ajax({
+                            url:baseUrl+"/api/Program/disposeProgram",
+                            type:"POST",
+                            dataType:"json",
+                            data:"data="+JSON.stringify(postDatas),
+                            success:function(data){
+                                layer.closeAll();
+                                switch (data.code) {
+                                    case 100:
+                                        tip(data.msg,function(){
+                                            var href = 'mylist.html?nid='+nid+'&title='+title+'&pid='+pid;
+                                            location.href = href;
+                                        });
+                                        break;
+                                    default:
+                                        tip(data.code);
+                                        break;
+                                }
+                            },
+                            error:function(){
+                                tip();
+                            }
+                        })
+                    });
+                }
+            },
+            error:function(){
+                layer.closeAll();
+                layer.open({
+                    content:"请求出错",
+                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                    shade:false,
+                    time:0.8
+                });
+            }
+        });
+        function href(){
+            var href = 'mylist.html?nid='+nid+'&title='+title+'&pid='+pid;
+            location.href = href;
+        }
+
+        if(status==2||status==4){
+            $(".msg-content").css("bottom","0");
+        }else{
+            $(".msg-content").css("bottom","1.45rem");
+        }
+</script>
+</body>
+</html>

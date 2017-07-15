@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    	<!-- 去除苹果手机的默认样式 -->
+    	<meta name="apple-mobile-web-app-capable" content="yes"/>
+    	<!-- 取消设备对手机号进行识别 -->
+    	<meta name="format-detection" content="telephone=no">
+    	<meta name="x5-orientation" content="portrait"/>
+    	<meta name="screen-orientation" content="portrait"/>		<title></title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<link rel="stylesheet" href="../css/list.css" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<script src="../js/jquery-3.2.1.min.js"></script>
+		<script src="../js/rem.js"></script>
+		<script src="../js/index.js"></script>
+	</head>
+	<body style="background: #fff;">
+		<header class="header">
+			<div class="header_content_top">
+                 <span onclick="location.href='item.html'"></span><em>检测项目一</em><i>添加数据</i>
+             </div>
+		</header>
+	
+		<section class="test-items-content">
+			<ol class="test-items-list">
+				<li>
+					<div class="test-items-top">
+						<p></p>
+					</div>
+					<div class="test-items-middle">
+						<div class="test-items-text">
+							<input type="text" />
+						    <input type="text" />
+						    <input type="text" />
+						    <input type="text" />
+						    <input type="text" />
+						</div>		    
+					</div>
+				</li>
+		</section>
+		<section style="height: 0.38rem;background: #f0f0f0;"></section>
+		<section class="test-items-btn">
+			<button type="button">提交</button>
+		</section>
+		
+		<script>
+			var index = 1; 
+			var num = getUrlValue("num");
+			$(".test-items-list").find("li").eq(0).find(".test-items-top p").text(num+"."+index);
+
+			// 添加数据
+			$(".header_content_top i").on("click",function(){
+				index++;
+				$(".test-items-list").append(
+					'<li>'+
+						'<div class="test-items-top">'+
+							'<p>'+num+'.'+index+'</p>'+
+						'</div>'+
+						'<div class="test-items-middle">'+
+							'<div class="test-items-text">'+
+								'<input type="text" />'+
+							    '<input type="text" />'+
+							    '<input type="text" />'+
+							    '<input type="text" />'+
+							    '<input type="text" />'+
+							'</div>'+   
+						'</div>'+
+					'</li>'
+				);
+			});
+		</script>
+	</body>
+</html>

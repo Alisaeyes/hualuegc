@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/doc.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/touchTouch.css">
+    <link rel="stylesheet" href="../css/message_detail.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link href="../css/iconfont.css" rel="stylesheet" type="text/css"/>
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/layer.js"></script>
+    <script src="../js/rem.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../js/touchTouch.jquery.js"></script>
+    <style>
+        .item_btn{padding:0.1rem 0.3rem;background: #39adff;color:#fff;margin-right: 0.3rem;border-radius:0.05rem;}
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="href()"></span><em></em>
+    </div>
+</div>
+<div class="message_detail">
+    <div class="tipContainer">
+        <!-- <a href="my-list-details.html?nid=qlafle&proid=2&classId=1&title=工作通知&pageName=请假申请" class="item">
+            <div class="time">2017-07-13 10:22</div>
+            <div class="cxt_page">
+                <div class="cxt_box"></div>
+                <h2 class="clearfix">
+                    <span class="fl">请假申请</span>
+                    <span class="fr">胡有明</span>
+                </h2>
+            </div>
+        </a> -->
+    </div>
+</div>
+
+
+<script>
+    var title = decodeURIComponent(getUrlValue("title"));
+    $(".header_content_top").find("em").text(title+'列表');
+   //  
+
+    /*跳转上一级*/
+    function href(){
+        var href = '../list-details.html?pid='+getUrlValue("pid");
+        location.href = href;
+    };
+
+    var user_id = Stor.getItem("user_id");
+    var nid = getUrlValue("nid");
+    var pid = getUrlValue("pid");
+    if(user_id&&nid){
+        console.log(user_id,nid)
+        loading();
+        $.ajax({
+            "url":baseUrl+"/api/program/getList",
+            "type":"POST",
+            "datatype":"JSON",
+            "data":"data="+ JSON.stringify({"userId":user_id,"nid":nid}),
+            "success":function(data){
+                layer.closeAll();
+                console.log(data)
+                var html = "";
+                switch (data.code) {
+                    case 100:
+                        //tip(data.msg);
+                        if(data.result.rel.length>0){
+                            data.result.rel.forEach(function(item,i){
+                                html += '<div class="item">'+
+                                    '<div class="time">'+formatDate(item.create_time)+'</div>'+
+                                    '<div class="cxt_page" style="height:2.1rem;">'+
+                                        '<div class="cxt_box"></div>'+
+                                        '<h2 class="clearfix">'+
+                                           '<span class="fl">'+data.result.name+'</span>'+
+                                            '<span class="fr">'+(item.status==1?"<b style='color:#999;'>待审</b>":(item.status==2?"<b style='color:green;'>审核通过</b>":(item.status==3?"<b style='color:red;'>驳回</b>":"<b style='color:#999;'>已撤销</b>")))+'</span>'+
+                                        '</h2>'+
+                                        '<a href="my-list-details.html?nid='+nid+'&proid='+item.proid+'&title='+title+'&pid='+pid+'&status='+item.status+'" class="item_btn fr">查看详细</a>'+
+                                    '</div>'+
+                                '</div>'
+                            });
+
+                            $(".tipContainer").append(html);
+                        }else{
+                            $(".tipContainer").html('<div class="empty"><img src="../images/empty.png" alt=""><p>这里什么都没有哦</p>')
+                        };
+                        break;
+                    case -99:
+                        tip(data.msg);
+                        break;
+                }
+            },
+            error:function(e){
+                tip("请求出错");
+            }
+        })    
+    }else{
+        tip("数据异常");
+    }
+</script>
+</body>
+</html>

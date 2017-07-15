@@ -1,0 +1,18 @@
+.header{width: 100%;line-height: 0.9rem;background:#ffffff;text-align: center;}
+.nav_page{position: relative;text-align:center;bottom:1.6rem;z-index: 21;}
+.nav_page p{font-size: 0.3rem;color: #FFF;}
+.nav_page span{font-size: 0.2rem;color: #fff;}
+.swiper-container{height: 2.4rem;overflow: hidden;}
+.swiper-slide a,.swiper-slide a img,.selling-brand-list-item a img,.guess-like-img img{display: block;width: 100%;height: 100%;}
+.swiper-pagination .swiper-pagination-bullet{width: 0.2rem;height: 0.2rem;background-color: #5f5651;}
+.swiper-pagination .swiper-pagination-bullet-active{width: 0.2rem;background-color: #fff;}
+
+.section_index{width: 100%;height: 0.8rem;background:#eeeeee;}
+.section_page{padding: 0.2rem 0 0.2rem 0.4rem;}
+.section_page p{font-size: 0.3rem;}
+.section_content{width: 100%;padding-top: 0.3rem;zoom:1;}
+.section_content>div{float: left;width:25%;text-align: center;margin-bottom: 0.35rem;}
+.section_content>div a{display: block;}
+.section_content img{width: 1.25rem;height: 1.25rem;}
+.section_content>div p{text-align: center;margin-top: 0.05rem;font-weight: 600;font-size: 0.3rem;}
+.section_content_a:after{content:"";display:block;width: 0;height: 0;clear: both;overflow: hidden;}

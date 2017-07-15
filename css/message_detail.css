@@ -1,0 +1,23 @@
+.message-content{margin-top: 2rem;}
+.message_detail{width:100%;height:3.52rem;margin-top:1.7rem;}
+.message_detail_content{margin-top: 0.8rem;}
+.time{max-width: 2.2rem;height: 0.47rem;line-height: 0.5rem;text-align: center;background: #c3c3c3;border-radius: 0.1rem;margin: 0 auto;font-weight: 600;color:#000;}
+.cxt_img{float: left;padding-left: 3%;}
+.cxt{padding-top: 0.35rem;}
+.cxt_con{float: left;margin-left: 2%;overflow: hidden;}
+.cxt_page{width: 5.06rem;height: 2.5rem;background: #ffffff;border-radius: 0.1rem;overflow: hidden;margin-bottom: 0.5rem;}
+.cxt_box{width: 5.06rem;height: 0.1rem;background: #39adff;}
+.cxt_con>p{color: #999999;}
+.cxt_page>h2{padding: 0.3rem;color: #39adff;}
+.cxt_page>p{padding-left: 0.3rem;color: #333333;font-size: 0.3rem;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;width: 100%;height: 0.6rem;}
+.tipContainer .item{display: block;width: 84%;margin-left: 8%;}
+.tipContainer .item .cxt_page{width: 100%;margin-top: 0.3rem;}
+.tipContainer .item .cxt_box{width: 100%;}
+.tipContainer .empty img{display: block;width: 128px;height: 128px;margin: 0 auto;margin-top: 1rem;}
+.tipContainer .empty p{text-align: center;padding: 0.2rem 0;font-size: 0.32rem;color: #999;}
+
+span.yes{font-size: 0.32rem;color: #54CC2D;}
+span.no{font-size: 0.32rem;color: #F4272F;}
+i.no{font-size: 0.30rem;color: #666;}
+span.pass{font-size: 0.3rem;color: #fff;background-color: #39adff;padding:0.08rem 0.2rem;margin-right: 0.3rem;border-radius: 0.12rem;}
+span.nopass{font-size: 0.32rem;color: #333;margin-right: 0.3rem;text-decoration: underline;}

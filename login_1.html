@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/login_1.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <script src="./js/rem.js"></script>
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/storage.js"></script>
+    <script src="./js/layer.js"></script>
+    <style>
+        .layui-m-layercont{padding: 10px 0 !important;}
+    </style>
+</head>
+<body style="background: #fff;">
+    <div class="header_top">
+        <img src="images/login2_01.png">
+        <div class="login_1">
+            <img src="images/log2_03.png">
+            <p>CS.EPMS</p>
+        </div>
+    </div>
+    <section class="login_1_form">
+            <label>
+                <i></i>
+                <input type="text" name="name" placeholder="用户名/手机号"  class="icon_user"><br>
+            </label>
+            <label class="clearfix">
+                <i></i>
+                <input type="password" name="pwd" placeholder="密码" class="icon_pass"><br>
+            </label>
+            <input class="c-btn mt-50 fs-30" type="button" value="登录" id="sing_btn"/>
+            <a href="javascript:;" class="fr">忘记密码？</a>
+    </section>
+    <!-- window.location.href='mycenter.html' -->
+    <script>
+        var name = Stor.getItem("name");
+        var pw = Stor.getItem("pw");
+        var user_id = Stor.getItem("user_id");
+        name!='null' && name ? $(".icon_user").val(name):0; 
+        pw!='null' && pw ? $(".icon_pass").val(pw):0;
+        user_id && (location.href = "index.html");
+
+        $("#sing_btn").on("click",function(){
+            var user = $(".icon_user").val();
+            var pw = $(".icon_pass").val();
+
+            if(user&&pw){
+                layer.open({
+                    type: 2,
+                    shadeClose: false,
+                });
+
+                $.ajax({
+                    "url": baseUrl+'/api/Login/login',
+                    "type": 'POST',
+                    "dataType": 'JSON',
+                    "data": "data="+JSON.stringify({"name":user,"pwd":pw}),
+                    success:function(data){
+                        layer.closeAll();
+
+                        switch (data.code) {
+                            case 100:
+                                Stor.setItem("name", user);
+                                Stor.setItem("pw", pw);
+                                Stor.setItem("user_id",data.result.id);
+                                layer.open({
+                                    content:data.msg,
+                                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                    shade:false,
+                                    time:0.8,
+                                    end:function(){
+                                        window.location.href="./index.html";
+                                    }
+                                });
+                                break;
+                            case -2:
+                                layer.open({
+                                    content:data.msg,
+                                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                    shade:false,
+                                    time:0.8,
+                                });
+                                break;
+                            case -1:
+                                layer.open({
+                                    content:data.msg,
+                                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                    shade:false,
+                                    time:0.8,
+                                });
+                                break;
+                        }
+                    },
+                    error:function(e){
+                        layer.closeAll();
+                        layer.open({
+                            content:"网络错误",
+                            style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                            shade:false,
+                            time:0.8
+                        });
+                    }
+                });
+            }else{
+                layer.open({
+                    type: 0,
+                    content: '用户名和密码不能为空',
+                    skin:"msg",
+                    time: 2 ,
+                    anim:false
+                });
+            }
+        }); 
+        /*回车登录*/
+        $(document).on('keydown', '.icon_pass', function(event) {
+            var code = event.keyCode || event.which || event.charCode;
+            code==13 && $("#sing_btn").click();
+        });
+    </script>
+</body>
+</html>

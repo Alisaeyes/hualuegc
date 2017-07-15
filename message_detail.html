@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/touchTouch.css">
+    <link rel="stylesheet" href="css/message.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link href="css/iconfont.css" rel="stylesheet" type="text/css"/>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/touchTouch.jquery.js"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="href()"></span><em></em>
+    </div>
+</div>
+<div class="message-content msg-content">
+  
+</div>
+<script>
+    var user_id = Stor.getItem("user_id"); 
+    var nid = getUrlValue("nid");
+    var proid = getUrlValue("proid");
+    $(".header_content_top em").text(decodeURIComponent(getUrlValue("pageName")));
+    
+    layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+    $.ajax({
+        url:baseUrl+"/api/program/getProgramOne",
+        type:"POST",
+        dataType:"JSON",
+        data:"data="+JSON.stringify({"userId":user_id,"proid":proid,"nid":nid}),
+        success:function(data){
+            console.log(data)
+            layer.closeAll();
+            var html = "";
+            var img = "";
+            var file = "";
+            switch (data.code) {
+                case 100:
+                    var timeLength = 0;
+                    for(var i = 0;i<data.result.length;i++){
+                        switch(data.result[i].type){
+                            case "text":
+                                if(!data.result[i].value)break;
+                                html += '<div class="doc_01">'+
+                                            '<span>'+(data.result[i].need==1?"<strong>*</strong>":"")+data.result[i].title+'</span>'+
+                                            '<input type="'+data.result[i].type+'" readonly="readonly" need="'+data.result[i].need+'" name="'+data.result[i].fnid+'" value="'+data.result[i].value+'"/>'+
+                                        '</div>'
+                                break;
+                            case "datetime":
+                                if(!data.result[i].value)break;
+                                timeLength++;
+                                html+='<div class="doc_01">'+
+                                            '<span>'+(data.result[i].need?'<strong>*</strong>':"")+data.result[i].title+'</span>'+
+                                            '<input type="text" readonly="readonly" class="datepicker datepicker'+timeLength+'" name="'+data.result[i].fnid+'" need="'+data.result[i].need+'" value="'+formatDate(parseInt(data.result[i].value))+'"/>'+
+                                        '</div>'
+                                break;
+                            case "decimal":
+                                if(!data.result[i].value)break;
+                                html+='<div class="doc_01">'+
+                                            '<span>'+(data.result[i].need?'<strong>*</strong>':"")+data.result[i].title+'</span>'+
+                                            '<input type="number" readonly="readonly" name="'+data.result[i].fnid+'" need="'+data.result[i].need+'" value="'+data.result[i].value+'"/>'+
+                                        '</div>'
+                                break;
+                            case "image":
+                                if(!data.result[i].value)break;
+                                data.result[i].value.split(",").forEach(function(value,i){
+                                    img +='<li class="fl"><a href="'+baseUrl+"/uploads/contract/"+value+'"><img src="'+baseUrl+"/uploads/contract/"+value+'"/></a></li>'
+                                });
+                                html+='<div class="doc_01 border_bottom mt">'+
+                                                '<span>'+(data.result[i].need?'<strong>*</strong>':"")+data.result[i].title+'</span>'+
+                                                '<ul class="imgs img-view clearfix">'+img+'</ul>'+
+                                                '<input type="hidden" readonly="readonly" name="'+data.result[i].fnid+'" need="'+data.result[i].need+'" class="img-src">'+
+                                            '</div>';
+                                break;
+                            case "textarea":
+                                if(!data.result[i].value)break;
+                                html += '<div class="doc_01 doc_03 border_bottom">'+
+                                            '<span>'+(data.result[i].need?'<strong>*</strong>':"")+data.result[i].title+'</span>'+
+                                            '<textarea class="txtcenter" readonly="readonly" need="'+data.result[i].need+'" name="'+data.result[i].fnid+'">'+data.result[i].value+'</textarea>'+
+                                        '</div>'
+                                break;
+                            case "file":
+                                if(!data.result[i].value)break;
+                                data.result[i].value.split(",").forEach(function(value,i){
+                                    file +='<a class="fl enclosures" href="'+baseUrl+'/uploads/contract/'+value+'"><t>附件'+(i+1)+'</t></a>'
+                                });
+                                html+='<div class="doc_01 border_bottom mt">'+
+                                                '<span>'+(data.result[i].need?'<strong>*</strong>':"")+data.result[i].title+'</span>'+
+                                                '<div class="imgs clearfix" style="margin-left:-0.2rem;">'+file+'</div>'+
+                                                '<input type="hidden" readonly="readonly" name="'+data.result[i].fnid+'" need="'+data.result[i].need+'" class="file-src">'+
+                                            '</div>';
+                                break;
+                        }
+                    }
+                    html += '<div class="doc_01 doc_03 border_bottom">'+
+                                '<span><strong style="color:red;">*</strong>意见：</span>'+
+                                '<textarea class="txtcenter backinfo" placeholder="" name="backinfo"></textarea>'+
+                            '</div>';
+                    html += '<div class="doc_05 btn-mt msg-btns clearfix" >'+
+                                '<input class="fl adopt" type="button" value="通过"><input class="fl reject" type="button" value="驳回">'+
+                            '</div>';
+
+                    $(".message-content").append(html);
+
+                    $(".img-view a").touchTouch();
+
+                    /*内容检测*/
+                    function testing(){
+                        var backinfo = $(".backinfo").val();
+                        if(!backinfo){
+                            tip("请填写意见");
+                            return false;
+                        }else{
+                           return backinfo;
+                        }
+                    };
+
+                    /*审核函数*/
+                    function toExamine(solve,backinfo){
+                        $.ajax({
+                            url:baseUrl+"/api/program/solveProgram",
+                            type:"POST",
+                            dataType:"JSON",
+                            data:"data="+JSON.stringify({"userId":user_id,"proid":proid,"nid":nid,"solve":solve,"backinfo":backinfo}),
+                            success:function(data){
+                                layer.closeAll();
+                                switch (data.code) {
+                                    case 100:
+                                        tip(data.msg,function(){
+                                            location.href="contract-tip.html?classId="+getUrlValue("classId")+"&title="+getUrlValue("title");
+                                        });
+                                        break;
+                                    case -99:
+                                        tip(data.msg);
+                                        break;
+                                    case -98:
+                                        tip(data.msg);
+                                        break;
+                                }
+                            },
+                            error:function(){
+                                layer.closeAll();
+                                layer.open({
+                                    content:"请求出错",
+                                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                    shade:false,
+                                    time:0.8
+                                });
+                            }
+                       });
+                    }
+
+                    /*通过*/
+                    $(".adopt").on("click",function(){
+                        var backinfo = testing();
+                        if(!backinfo) return false;
+                        layer.open({
+                            type: 2,
+                            shadeClose: false,
+                        });
+                        toExamine(2,backinfo);
+                    });
+
+                    /*驳回*/
+                    $(".reject").on("click",function(){
+                        var backinfo = testing();
+                        if(!backinfo) return false;
+                        layer.open({
+                            type: 2,
+                            shadeClose: false,
+                        });
+                        toExamine(3,backinfo);
+                    });
+                }
+            },
+            error:function(){
+                layer.closeAll();
+                layer.open({
+                    content:"请求出错",
+                    style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                    shade:false,
+                    time:0.8
+                });
+            }
+        });
+        function href(){
+            var href = 'contract-tip.html?classId='+getUrlValue("classId")+'&title='+getUrlValue("title");
+            location.href = href;
+        }
+</script>
+
+
+</body>
+</html>

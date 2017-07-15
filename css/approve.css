@@ -1,0 +1,18 @@
+.header_approve { height: 0.92rem; border-bottom: 0.01rem solid #dddddd; text-align: center; font-size: 0; background: #fff;}
+.header_approve span { display: inline-block; vertical-align: top; width: 50%; font-size: 0.3rem; line-height: 0.88rem; }
+.header_approve span em { width: 80%; display: inline-block; }
+.header_approve span.active em { border-bottom: 0.06rem solid #33acff; color: #33acff; }
+
+.middle_approve { margin-top: 0.2rem; }
+.middle_approve li { background: #fff; padding: 0.5rem 1.8rem 0.5rem 1.24rem; position: relative; margin-top: 0.2rem; border-top: 0.01rem solid #dddddd; border-bottom: 0.01rem solid #dddddd; }
+.middle_approve li .middle_contact_line { position: absolute; left: 0; top: 0; }
+.middle_approve li span { position: absolute; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #5fd187; font-size: 0.36rem; text-align: center; line-height: 0.8rem; color: #fff; left: 0.24rem; top: 0.5rem; }
+.middle_approve_content h3 { color: #000; font-size: 0.32rem; margin-bottom: 0.14rem; }
+.middle_approve_content p { color: #999999; font-size: 0.28rem; line-height: 0.48rem; }
+.middle_approve_right { position: absolute; right: 0.26rem; top: 0.58rem; }
+.middle_approve_right p { text-align: right; font-size: 0.24rem; color: #aaaaaa; }
+.middle_approve_right em { display: block; width: 1.44rem; height: 0.5rem; border-radius: 0.25rem; border: 0.01rem solid #0094ff; color: #0094ff; font-size: 0.28rem; text-align: center; line-height: 0.48rem; margin-top: 0.54rem; }
+
+.bottom_approval { margin-top: 1.7rem; text-align: center; }
+.bottom_approval img { width: 2.46rem; height: 2.32rem;}
+.bottom_approval p { margin-top: 0.2rem; font-size: 0.32rem; color: #999999; }

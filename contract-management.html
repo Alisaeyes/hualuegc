@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>合同管理</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='index.html'"></span><em>合同管理</em><i>关闭</i>
+    </div>
+</div>
+<section  class="doc_form">
+        <div class="doc_01 require">
+            <span>合同名称</span>
+             <input type="text" name="name" placeholder="请输入合同名称"/>
+             <em></em>
+         </div>
+         <div class="doc_01 require doc_03 border_bottom">
+            <span>合同主体</span>
+             <textarea name="contractBody"  class="txtcenter" placeholder="请输入合同主体内容"></textarea>
+         </div>
+         <div class="doc_01 require">
+            <span>甲方代表名字</span>
+             <input type="text" name="jname" placeholder="甲方代表名字"/>
+             <em></em>
+         </div>
+          <div class="doc_01 require">
+            <span>甲方公司</span>
+             <input type="text" name="jcompany" placeholder="甲方公司"/>
+             <em></em>
+         </div>
+         <div class="doc_01 require">
+            <span>乙方代表名字</span>
+             <input type="text" name="yname" placeholder="乙方代表名字"/>
+             <em></em>
+         </div>
+          <div class="doc_01 require">
+            <span>乙方公司</span>
+             <input type="text" name="ycompany" placeholder="乙方公司"/>
+             <em></em>
+         </div>
+         <div class="doc_01 require">
+            <span>合同签约时间</span>
+             <input type="date" name="dateTime" />
+             <em></em>
+         </div>
+         <div class="doc_01 require">
+            <span>合同备注信息</span>
+             <input type="text" name="backinfo" placeholder="合同备注信息"/>
+             <em></em>
+         </div>
+        <div class="doc_01 doc_03 mt doc_turner">
+                <span>扭转人</span>
+                <i class="i3 add_turner"></i>
+                <ul class="approve_man clearfix">
+                </ul>
+         </div>
+         <div class="doc_01 border_bottom mt">
+                <span>合同照片</span>
+                <b>上传合同照片</b>
+                <input id="img-src" name="contractImg" type="text" style="display: none;">
+                <div  id="imgPicker" class="i1"></div>
+         </div>
+          <div class="doc_01 border_bottom mt">
+                <span>合同附件<small>(可选)</small></span>
+                <b>上传合同附件</b>
+                <input id="file-src" type="text" name="contractFile" style="display: none;">
+                <div  id="filePicker" class="i2"></div>
+         </div>
+         <div class="doc_05 btn-mt" >
+                <input type="submit" class="sub_detail" value="提交">
+        </div>
+
+
+
+</section>
+<script type="text/javascript" src="./js/webupload/webuploader.min.js"></script>
+<script>
+    var user_id = Stor.getItem("user_id");
+    user_id?0:location.href="./login_1.html";
+   /*添加扭转人*/
+     $(".add_turner").on("click",function(){
+                  layer.open({
+                        type: 2,
+                        shadeClose: false,
+                  });
+                    /*扭转人分组*/
+                  var option = "";
+                    $.ajax({
+                        url:baseUrl+"/api/member/getGroups",
+                        type:"POST",
+                        dataType:"json",
+                        data:"data=''",
+                        success:function(data){
+                                if(data.code==100){
+                                    data.result.forEach( function(value, index) {
+                                        option+='<option value='+value.id+'>'+value.group_name+'</option>'
+                                    })                                           
+                                }         
+                        }
+                    })
+                    /*弹出层扭转人列表*/ 
+                 $.ajax({
+                        url:baseUrl+"/api/member/getMembers",
+                        type:"POST",
+                        dataType:"json",
+                        data:"data="+JSON.stringify({groupid:1}),
+                        success:function(data){
+                            layer.closeAll();
+                            if(data.code==100){
+                                    var    li  = "";
+                                    data.result.member.forEach(function(value,index){
+                                            li += '<li><input type="checkbox" value='+value.id+'><label for="">'+value.name+'</label><label for="">'+value.group_name+'</label></li>'; 
+                                    })
+                                    var t_html = '<div class="alert_turner">'+
+                                               '<div class="clearfix"><select class="group_turner fl">'+option+ '</select>'+
+                                               '<input id="search_input" class="search fr" type="text" placeholder="关键字"></div>'+
+                                               '<div class="caption clearfix"><input type="checkbox"><label>姓名</label><label for="">部门</label></div>'+
+                                               '<ul class="turner_list">'+
+                                               li+ '</ul>'+ 
+                                               '<div class="page clearfix"><span class="prev fl">上一页</span><span class="next fr">下一页</span></div></div>';
+                                   layer.open({
+                                        success:function(){
+                                            /*切换分组更新名单列表*/
+                                            $(".group_turner").on('change', function(event) {
+                                                var _groupid = $(this).val();
+                                               $.ajax({
+                                                    url:baseUrl+"/api/member/getMembers",
+                                                    type:"POST",
+                                                    dataType:"json",
+                                                    data:"data="+JSON.stringify({groupid:_groupid}),
+                                                    success:function(data){
+                                                        if(data.code==100){
+                                                            li = "";
+                                                            data.result.member.forEach(function(value,index){
+                                                                    li += '<li><input type="checkbox" value='+value.id+'><label for="">'+value.name+'</label><label for="">'+value.group_name+'</label></li>'; 
+                                                            })
+                                                            $(".turner_list").html(li);
+                                                        }
+                                                    },
+                                                    error:function(){
+                                                        layer.closeAll();
+                                                        layer.open({
+                                                            content:"网络错误",
+                                                            style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                                            shade:false,
+                                                            time:0.8
+                                                        });
+                                                    }
+                                               }) 
+                                            });
+                                        }
+                                        ,content: t_html
+                                        ,btn: ['确认', '取消']
+                                        ,yes: function(){
+                                            var select_arr = [],
+                                                  append_li = '',
+                                                  select_items = $(".turner_list input[type=checkbox]:checked");
+                                                select_items.each(function(){
+                                                    select_arr.push({
+                                                        id : $(this).val(),
+                                                        name : $(this).next().text()
+                                                    })
+                                                })
+                                            select_arr.forEach( function(value, index) {
+                                                 append_li += '<li data-id='+value.id+'><img src="images/user_name_12.png" alt=""><p>'+value.name+'</p></li>'
+                                            });
+                                            $(".approve_man").append(append_li);
+                                            layer.closeAll();
+                                        }
+                                        ,no:function(){
+                                            layer.closeAll();
+                                        }
+                                      })
+                            }                                
+                        },
+                        error:function(){
+                            layer.closeAll();
+                            layer.open({
+                                content:"网络错误",
+                                style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                                shade:false,
+                                time:0.8
+                            });
+                        }
+                    })                   
+    });     
+
+    /*上传图片实例化*/
+    //参数true和false是用来区分图片和文件上传
+    upload("#imgPicker",true,"#img-src")
+    upload("#filePicker",false,"#file-src")
+
+
+    /*合同管理数据提交*/
+$("input[type=submit]").on("click",function(){
+       var  elems = $(".doc_01>textarea,.doc_01>input"),
+              datas  = [],
+              //mark   = 0,
+              turners = [],
+              turners_elem = $(".doc_turner ul li"),
+              postDatas ;
+       elems.each(function() {
+              var $this = $(this),
+                    elem = {};
+                elem[$this.attr("name")]=$this.val();
+                // if(!($this.val())){
+                //     mark=1;
+                // } 
+                datas.push(elem)
+       })
+       turners_elem.each(function(){
+            turners.push($(this).data("id"))
+       })
+       // if(mark || turners.length==0) {
+       //      layer.open({
+       //          content:"数据不完整哦",
+       //          skin:"msg",
+       //          time:2
+       //      });
+       //    return false
+       // }
+       postDatas={
+            "userId":Stor.getItem("user_id"),
+            "turner":turners,
+            "name":datas.splice(0,1)[0]["name"],
+            "body":datas,
+       }
+      console.log( JSON.stringify(postDatas))
+       layer.open({
+            type: 2,
+            shadeClose: false,
+        });
+      $.ajax({
+        url:baseUrl+"/api/Program/disposeProgram",
+        type:"POST",
+        dataType:"json",
+        data:"data="+JSON.stringify(postDatas),
+        success:function(result){
+            layer.closeAll();
+            if(result.code=="100"){
+                layer.open({
+                    content:result.msg,
+                    skin:"msg",
+                    time:2
+                })
+            }else if(result.code=="-1"){
+                layer.open({
+                    content:result.msg,
+                    skin:"msg",
+                    time:2
+                })
+            }
+        },
+        error:function(jqxhr){
+            console.log(jqxhr.responseText)
+        }
+      })
+});
+                    
+</script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initiafFl-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/touchTouch.css">
+    <link rel="stylesheet" href="css/message.css">
+    <link href="css/iconfont.css" rel="stylesheet" type="text/css"/>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/touchTouch.jquery.js"></script>
+    
+   <script src="js/fileUpload.js"></script>
+    <!--日期插件  -->
+   <script src="js/date.js"></script>
+    <script src="js/iscroll.js"></script>
+    <style>
+        .layui-m-layercont{padding: 10px 0 !important;}
+        .doc_01 strong{color:red;}
+        .delete_img,.delete_file{position: absolute;z-index:1000;right:-0.2rem;top:-21%;}
+        .enclosures .delete_file{top:-28%;}
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="location.href='index.html'"></span><em></em>
+        <i class="list_btn">列表</i>
+    </div>
+</div>
+<section  class="doc_form">
+       
+</section>
+<div id="datePlugin"></div>
+<script>
+    var pid = getUrlValue("pid");
+    var user_id = Stor.getItem("user_id");
+    var proid = getUrlValue("proid");
+    var nid = getUrlValue("nid");
+    user_id?0:location.href="./login_1.html";
+    layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+
+    if(pid&&user_id){
+        if(proid){
+            var title = decodeURIComponent(getUrlValue("title"));
+            $(".header_content_top em").text(title);
+            $.ajax({
+                url:baseUrl+"/api/program/getDetail",
+                type:"POST",
+                dataType:"JSON",
+                data:"data="+JSON.stringify({"userId":user_id,"proid":proid,"nid":nid}),
+                success:function(data){
+                    layer.closeAll();
+                    var html = "";
+                    console.log(data)
+                    switch (data.code) {
+                        case 100:
+                            var timeLength = 0;
+                            var img = "";
+                            var file = "";
+                            data.result.content.forEach(function(item,i){
+                                switch (item.type) {
+                                    case "text":
+                                            html += '<div class="doc_01">'+
+                                                    '<span>'+(item.need?"<strong>*</strong>":"")+item.title+'</span>'+
+                                                    '<input type="'+item.type+'" need="'+item.need+'" name="'+item.fnid+'" placeholder="'+item.comment+'" value="'+item.value+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "number":
+                                            html += '<div class="doc_01">'+
+                                                    '<span>'+(item.need?"<strong>*</strong>":"")+item.title+'</span>'+
+                                                    '<input type="'+item.type+'" need="'+item.need+'" name="'+item.fnid+'" placeholder="'+item.comment+'" value="'+item.value+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "datetime":
+                                            timeLength++;
+                                            html+='<div class="doc_01">'+
+                                                        '<span>'+(item.need?'<strong>*</strong>':"")+item.title+'</span>'+
+                                                        '<input type="text" class="datepicker datepicker'+timeLength+'" name="'+item.fnid+'" need="'+item.need+'" placeholder="'+item.comment+'" value="'+formatDate(item.value)+'"/>'+
+                                                        '<em></em>'+
+                                                    '</div>'
+                                        break;
+                                    case "decimal":
+                                            html+='<div class="doc_01">'+
+                                                    '<span>'+(item.need?'<strong>*</strong>':"")+item.title+'</span>'+
+                                                    '<input type="number" name="'+item.fnid+'" need="'+item.need+'" placeholder="'+item.comment+'" value="'+item.value+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "image":
+                                            if(data.result.content[i].value!=""){
+                                                data.result.content[i].value.split(",").forEach(function(value,i){
+                                                    img +='<li class="fl" style="position:relative;"><i class="iconfont icon-gou icon-cha delete_img"></i><a href="'+baseUrl+"/uploads/contract/"+value+'"><img src="'+baseUrl+"/uploads/contract/"+value+'" _src="'+value+'"/></a></li>'
+                                                });
+                                            };
+                                            html+='<div class="doc_01 border_bottom mt">'+
+                                                            '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                                            '<ul class="imgs img-view clearfix">'+img+'</ul>'+
+                                                            '<input type="hidden" readonly="readonly" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" class="img-src">'+
+                                                            '<div id="imgUploadContent" class="fileUploadContent"></div>'+
+                                                        '</div>';
+                                        break;
+                                    case "textarea":
+                                            html += '<div class="doc_01 doc_03 border_bottom">'+
+                                                    '<span>'+(item.need?'<strong>*</strong>':"")+item.title+'</span>'+
+                                                    '<textarea class="txtcenter" placeholder="'+item.comment+'" need="'+item.need+'" name="'+item.fnid+'">'+item.value+'</textarea>'+
+                                                '</div>'
+                                        break;
+                                    case "file":
+                                            if(data.result.content[i].value!=""){
+                                                data.result.content[i].value.split(",").forEach(function(value,i){
+                                                    file +='<a class="fl enclosures" href="'+baseUrl+'/uploads/contract/'+value+'" _href="'+value+'"  style="position:relative;"><i class="iconfont icon-gou icon-cha delete_file"></i><t style="font-size:0.2rem;">附件'+(i+1)+'</t></a>'
+                                                });
+                                            };
+                                            html+='<div class="doc_01 border_bottom mt">'+
+                                                            '<span>'+(data.result.content[i].need?'<strong>*</strong>':"")+data.result.content[i].title+'</span>'+
+                                                            '<div class="imgs file-lists clearfix" style="margin-left:-0.2rem;">'+file+'</div>'+
+                                                            '<input type="hidden" readonly="readonly" name="'+data.result.content[i].fnid+'" need="'+data.result.content[i].need+'" class="file-src">'+
+                                                            '<div id="fileUploadContent" class="fileUploadContent"></div>'+
+                                                        '</div>';
+                                        break;
+                                }
+
+
+                            });
+
+                            html += '<div class="doc_05 btn-mt" >'+
+                                        '<input type="submit" class="sub_detail" value="提交">'+
+                                    '</div>';
+                            $(".doc_form").append(html);
+                            // 图片查看
+                            $(".img-view a").touchTouch();
+                              /*日期选择*/
+                            var time = $(".datepicker").length;
+                            for(var i= 1;i<=time;i++){
+                                $('.datepicker'+i).date({theme:"datetime"});
+                            }
+
+                            /*上传图片*/
+                            uploadImg("imgUploadContent","img-src","/api/upload/uploadContract",['png','jpg','gif','PNG','JPG','GIF']);
+
+                            /*上传附件*/
+                            uploadFile("fileUploadContent","file-src","/api/upload/uploadContract",['docx','doc','txt','DOCX','DOC','TXT','xlsx']);
+
+                            /*列表跳转*/
+                            $(".list_btn").on("click",function(){
+                                var href = './list/mylist.html?title='+$(".header_content_top em").text()+'&pid='+pid+'&nid='+nid;
+                                location.href = href;
+                            });
+
+                            /*修改图片*/
+                            var imgArr = [];
+                            $(".img-view li .delete_img").each(function(){
+                                var src = $(this).siblings().find("img").attr("_src");
+                                imgArr.push(src);
+                            });
+                            $(".img-src").val(imgArr.join(","));
+
+                            $(".img-view li").on("click",".delete_img",function(){
+                                var src = $(this).siblings().find("img").attr("_src");
+                                var inputSrc = $(".img-src").val().split(",");
+                                inputSrc.forEach(function(item,i){
+                                    if(item==src){
+                                        inputSrc.splice(i,1);
+                                    }
+                                });
+                                $(".img-src").val(inputSrc.join(","));
+                                $(this).parents("li").remove();
+                            });
+
+                            /*修改附件*/
+                            var fileArr = [];
+                            $(".file-lists .enclosures").each(function(){
+                                var href = $(this).attr("_href");
+                                fileArr.push(href);
+                            });
+                            $(".file-src").val(fileArr.join(","));
+
+                            $(".file-lists .enclosures").on("click",".delete_file",function(ev){
+                                var href = $(this).parents("a.enclosures").attr("_href");
+                                var inputHref = $(".file-src").val().split(",");
+                                inputHref.forEach(function(item,i){
+                                    if(item==href){
+                                        inputHref.splice(i,1);
+                                    }
+                                });
+                                $(".img-src").val(inputHref.join(","));
+                                $(this).parents("a.enclosures").remove();
+                                return false;
+                            });
+
+                             /*数据提交*/
+                            $("input[type=submit]").on("click",function(){
+                                var postDatas = {
+                                    "userId":user_id,
+                                    "nid":nid,
+                                    "proid":proid,
+                                    "type":4,
+                                    "datas":{
+                                    }
+                                }
+                                
+                                var k = 0;
+                                var inputAll = $(".doc_01>input,.doc_01>select,.doc_01>textarea");
+                                inputAll.each(function(){
+                                    if($(this).attr("need")=="1"&&($(this).val()=="")){
+                                        k = 1;
+                                    }else{
+                                        k=0
+                                    }
+                                    var val = $(this).val();
+                                    var name = $(this).attr("name");
+                                    var reg = /\d{4,}-\d{1,}-\d{1,}\s\d{1,}:\d{1,}/g.test(val);
+                                    postDatas.datas[name] = reg ? new Date(val).getTime()/1000:val;
+                                });
+
+                                if(k){
+                                    tip("内容不完整");
+                                    return false;
+                                }
+                                
+                                layer.open({
+                                    type: 2,
+                                    shadeClose: false,
+                                });
+                                $.ajax({
+                                    url:baseUrl+"/api/Program/disposeProgram",
+                                    type:"POST",
+                                    dataType:"json",
+                                    data:"data="+JSON.stringify(postDatas),
+                                    success:function(result){
+                                        layer.closeAll();
+                                        if(result.code>0){
+                                           tip(result.msg,function(){location.href="./index.html"})
+                                        }else{
+                                            tip(result.msg)
+                                        }
+                                    },
+                                    error:function(jqxhr){
+                                         layer.closeAll();
+                                         tip("请求出错");
+                                    }
+                                })
+                            });
+
+                            break;
+                        default:
+                            // statements_def
+                            break;
+                    }
+                } 
+            });
+        }else{
+            $.ajax({
+                url:baseUrl+"/api/program/getProgram",
+                type:"POST",
+                dataType:"JSON",
+                data:"data="+JSON.stringify({"userId":user_id,"pid":pid}),
+                success:function(data){
+                    console.log(data)
+                    layer.closeAll();
+                    var html = "";
+                    switch (data.code) {
+                        case 100:
+                            var title = data.result.pro.name;
+                            var timeLength = 0;
+                            $(".header_content_top em").text(title);
+                            for(var i = 0;i<data.result.fie.length;i++){
+                                switch(data.result.fie[i].type){
+                                    case "text":
+                                        html += '<div class="doc_01">'+
+                                                    '<span>'+(data.result.fie[i].need?"<strong>*</strong>":"")+data.result.fie[i].title+'</span>'+
+                                                    '<input type="'+data.result.fie[i].type+'" need="'+data.result.fie[i].need+'" name="'+data.result.fie[i].fnid+'" placeholder="'+data.result.fie[i].comment+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "number":
+                                        html += '<div class="doc_01">'+
+                                                    '<span>'+(data.result.fie[i].need?"<strong>*</strong>":"")+data.result.fie[i].title+'</span>'+
+                                                    '<input type="'+data.result.fie[i].type+'" need="'+data.result.fie[i].need+'" name="'+data.result.fie[i].fnid+'" placeholder="'+data.result.fie[i].comment+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "datetime":
+                                        timeLength++;
+                                        html+='<div class="doc_01">'+
+                                                    '<span>'+(data.result.fie[i].need?'<strong>*</strong>':"")+data.result.fie[i].title+'</span>'+
+                                                    '<input type="text" class="datepicker datepicker'+timeLength+'" name="'+data.result.fie[i].fnid+'" need="'+data.result.fie[i].need+'" placeholder="'+data.result.fie[i].comment+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "decimal":
+                                        html+='<div class="doc_01">'+
+                                                    '<span>'+(data.result.fie[i].need?'<strong>*</strong>':"")+data.result.fie[i].title+'</span>'+
+                                                    '<input type="number" name="'+data.result.fie[i].fnid+'" need="'+data.result.fie[i].need+'" placeholder="'+data.result.fie[i].comment+'"/>'+
+                                                    '<em></em>'+
+                                                '</div>'
+                                        break;
+                                    case "image":
+                                        html+='<div class="doc_01 border_bottom mt">'+
+                                                        '<span>'+(data.result.fie[i].need?'<strong>*</strong>':"")+data.result.fie[i].title+'</span>'+
+                                                        '<b>'+data.result.fie[i].comment+'</b>'+
+                                                        '<input type="hidden" name="'+data.result.fie[i].fnid+'" need="'+data.result.fie[i].need+'" class="img-src">'+
+    													'<div id="imgUploadContent" class="fileUploadContent"></div>'+
+                                                    '</div>';
+                                        break;
+                                    case "textarea":
+                                        html += '<div class="doc_01 doc_03 border_bottom">'+
+                                                    '<span>'+(data.result.fie[i].need?'<strong>*</strong>':"")+data.result.fie[i].title+'</span>'+
+                                                    '<textarea class="txtcenter" placeholder="'+data.result.fie[i].comment+'" need="'+data.result.fie[i].need+'" name="'+data.result.fie[i].fnid+'"></textarea>'+
+                                                '</div>'
+                                        break;
+                                    case "file":
+                                        html+='<div class="doc_01 border_bottom mt">'+
+                                                        '<span>'+(data.result.fie[i].need?'<strong>*</strong>':"")+data.result.fie[i].title+'</span>'+
+                                                        '<b>'+data.result.fie[i].comment+'</b>'+
+                                                        '<input type="hidden" name="'+data.result.fie[i].fnid+'" need="'+data.result.fie[i].need+'" class="file-src">'+
+    													'<div id="fileUploadContent" class="fileUploadContent"></div>'+
+                                                    '</div>';
+                                        break;
+                                }
+
+                                 
+                            }
+                            html += '<div class="doc_05 btn-mt" >'+
+                                        '<input type="submit" class="sub_detail" value="提交">'+
+                                    '</div>';
+                            $(".doc_form").append(html);
+    		
+                            /*日期选择*/
+                            var time = $(".datepicker").length;
+                            for(var i= 1;i<=time;i++){
+                                $('.datepicker'+i).date({theme:"datetime"});
+                            }
+
+                            /*上传图片*/
+                            uploadImg("imgUploadContent","img-src","/api/upload/uploadContract",['png','jpg','gif','PNG','JPG','GIF']);
+
+                            /*上传附件*/
+                            uploadFile("fileUploadContent","file-src","/api/upload/uploadContract",['docx','doc','txt','DOCX','DOC','TXT','xlsx']);
+
+                            /*列表跳转*/
+                            var nid = data.result.pro.nid;
+                            $(".list_btn").on("click",function(){
+                                var href = './list/mylist.html?title='+$(".header_content_top em").text()+'&pid='+getUrlValue("pid")+'&nid='+nid;
+                                location.href = href;
+                            });
+
+
+                            /*数据提交*/
+                            $("input[type=submit]").on("click",function(){
+                                var nid = data.result.pro.nid;
+                                var postDatas = {
+                                    "userId":user_id,
+                                    "nid":nid,
+                                    "type":1,
+                                    "datas":{
+                                    }
+                                }
+
+                                var k = 0;
+                                var inputAll = $(".doc_01>input,.doc_01>select,.doc_01>textarea");
+                                inputAll.each(function(){
+                                    if($(this).attr("need")=="1"&&($(this).val()=="")){
+                                        k = 1;
+                                    }else{
+                                        k = 0
+                                    }
+                                    var val = $(this).val();
+                                    var name = $(this).attr("name");
+                                    var reg = /\d{4,}-\d{1,}-\d{1,}\s\d{1,}:\d{1,}/g.test(val);
+                                    postDatas.datas[name] = reg ? new Date(val).getTime()/1000:val;
+                                });
+
+                                if(k){
+                                    tip("内容不完整");
+                                    return false;
+                                }
+                                
+                                layer.open({
+                                    type: 2,
+                                    shadeClose: false,
+                                });
+                                $.ajax({
+                                    url:baseUrl+"/api/Program/disposeProgram",
+                                    type:"POST",
+                                    dataType:"json",
+                                    data:"data="+JSON.stringify(postDatas),
+                                    success:function(result){
+                                        layer.closeAll();
+                                        if(result.code>0){
+                                           tip(result.msg,function(){location.href="./index.html"})
+                                        }else{
+                                            tip(result.msg)
+                                        }
+                                    },
+                                    error:function(jqxhr){
+                                         layer.closeAll();
+                                         tip("请求出错");
+                                    }
+                                })
+                            });
+                            break;
+                        default:
+                            tip("数据加载失败");
+                            break;
+                    }
+                },
+                error:function(){
+                    layer.closeAll();
+                    tip("请求出错");
+                }
+            });
+        }
+    }
+</script>
+
+
+
+</body>
+</html>

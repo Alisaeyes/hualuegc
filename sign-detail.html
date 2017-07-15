@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/sign-detail.css">
+    <script src="js/rem.js"></script>
+
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='sign.html'"></span><em>签到</em>
+    </div>
+</div>
+<form action="#">
+    <div class="sign_detail_01">
+        <p>湖北省武汉市武昌区徐家棚街道和平大道恒大首府4303</p>
+    </div>
+    <div class="sign_detail_02">
+        <p>签到时间：<span>2017-05-20</span><em>12:00</em></p>
+    </div>
+    <div class="middle_contact_line"></div>
+    <div class="sign_detail_03">
+        <div class="sign_detail_03_content"><span>备注</span><input type="text" placeholder="请输入备注"></div>
+        <img src="images/sign_detail_03.png" alt="">
+    </div>
+    <div class="middle_contact_line"></div>
+    <div class="sign_detail_04">
+        <p>选择需要创建的外勤工作事项</p>
+        <div class="sign_detail_04_r"><em><span></span><input type="radio" id="radio1" name="work"><label for="radio1">客户跟进</label></em></div>
+        <div class="sign_detail_04_r"><em><span></span><input type="radio" id="radio2" name="work"><label for="radio2">出差</label></em></div>
+    </div>
+    <input type="submit" class="sub_detail" value="提交">
+</form>
+</body>
+</html>

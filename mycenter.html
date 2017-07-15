@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/mycenter.css">
+    <link rel="stylesheet" href="css/base.css">
+    <script src="js/rem.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+<header class="header_top clearfix">
+    <a href="user.html" style="display: block;width:100%;text-align: right;height:100%;">
+        <div class="head_left fl">
+            <img src="" style="width:1.43rem;height: 1.43rem ">
+        </div>
+        <div class="head_wrap fl" style="">
+            <p></p>
+            <div class="head_wrap_name"></div>
+        </div>
+        <div class="head_right fr" style="">
+            <img src="images/mycenter_04.png" style="height: 0.41rem; width: 0.31rem">
+        </div>
+    </a>
+</header>
+    <div class="section_mycenter clearfix">
+        <div>
+            <a href="check.html"><img src="images/mycenter_15.png"/>
+            <p>我的考勤</p></a>
+        </div>
+        <div>
+            <a href="#"><img src="images/mycenter_18.png"/>
+            <p>我的日志</p></a>
+        </div>
+        <div>
+            <a href="#"><img src="images/mycenter_26.png"/>
+            <p>我的待办</p></a>
+        </div>
+        <div>
+            <a href="message.html"><img src="images/mycenter_23.png"/>
+            <p>我的消息</p></a>
+        </div>
+        <div>
+            <a href="help.html"><img src="images/mycenter_31.png"/>
+            <p>帮助中心</p></a>
+        </div>
+        <div>
+            <a href="user.html"><img src="images/mycenter_33.png"/>
+            <p>设置</p></a>
+        </div>
+    </div>
+
+<div class="footer">
+    <div onClick="location.href='./message.html'">
+            <i class="iconfont">&#xe656;</i>
+            <p>消息</p>
+            <span class="msgTip"></span>
+    </div>
+    <div onClick="location.href='./index.html'">
+            <i class="iconfont">&#xe612;</i>
+            <p>工作</p>
+    </div>
+     <div onClick="location.href='./address.html'">
+            <i class="iconfont">&#xe623;</i>
+            <p>通讯录</p>
+    </div>
+    <div onClick="location.href='./mycenter.html'" class="active">
+            <i class="iconfont">&#xe653;</i>
+            <p>我的</p>
+    </div>
+</div>
+
+<script>
+    var user_id = Stor.getItem("user_id");
+    if(user_id){
+        layer.open({
+            type: 2,
+            shadeClose: false,
+        });
+        $.ajax({
+            url:baseUrl+"/api/member/getinfo",
+            type:"POST",
+            data:"data="+JSON.stringify({userId:user_id}),
+            datatype:"json",
+            success:function(data){
+                layer.closeAll();
+                switch (data.code) {
+                    case 100:
+                        $(".head_left img").attr("src",baseUrl+'/uploads/face/'+data.result.head_img);
+                        $(".head_wrap p").text(data.result.nickname);
+                        $(".head_wrap_name").text(data.result.groupname);
+                        break;
+                    case -99:
+                        break;
+                }
+            },
+            error:function(){
+                layer.closeAll();
+                tip("请求出错");
+            }
+        });
+    }else{
+        window.location.href="./login_1.html";
+    }
+</script>
+</body>
+</html>

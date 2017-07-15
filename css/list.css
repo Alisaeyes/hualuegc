@@ -1,0 +1,51 @@
+@charset "utf-8";
+/* 物资入库 start */
+.section_message,.doc_form{margin-top: 1.16rem;}
+.section_message .message_content{padding: 0;height: 1.1rem;line-height:1.1rem;width: 100%;padding: 0 0.3rem;margin: 0;border: none;border-bottom: 1px solid #ddd;}
+.section_message .message_content img{width: 0.8rem; height: 0.8rem;display: inline-block;vertical-align: middle;margin-top: -0.13rem;margin-right:0.2rem;}
+.section_message .message_content a{display: block;height: 100%;}
+.section_message .message_content p{display: inline;font-size: 0.32rem;}
+.select_type{margin-right: 0.7rem;margin-top: 0.27rem;}
+/* 物资入库 end */
+
+/*project*/
+.project_content{width: 100%;height: auto;margin-top: 1.16rem;}
+.project_content_list{width:100%;height:1.2rem;margin-bottom: 0.2rem;border-top: 0.01rem solid #ddd;background: #fff; border-bottom: 0.01rem solid #ddd;}
+.project_content_list p{display: inline-block;font-size: 0.32rem;line-height: 1.2rem;padding-left: 0.36rem;}
+.project_content_list div{float: right;width:1.46rem;height:0.52rem;border-radius: 0.3rem ;background: #33acff;margin: 0.35rem 0.36rem;}
+.project_content_list>div a{font-size: 0.3rem;color:#fff;line-height: 0.52rem;padding-left: 0.44rem;}
+
+/*item*/
+.item-content{width: 100%;height:auto;position: absolute;bottom:1.44rem;left:0;top:1.23rem;}
+.item-title{position:relative;left:0;top:0;height: 0.79rem;line-height: 0.79rem;}
+.item-content form{position: absolute;bottom: 0;left: 0;width: 100%;top:0.8rem;overflow-y: auto;z-index:0;}
+.item-content-list{width: 100%;background: #fff;border-bottom:0.01rem solid #dddddd;padding: 0 0.32rem;margin-bottom: 0.2rem;}
+.item-content-list:first-of-type{  border-bottom: 0.01rem solid #dddddd;}
+.item-content-list em{color:#000;font-size: 0.32rem;line-height: 0.82rem;width: 31%;overflow: hidden;height: 0.82rem;}
+.item-content-list>i{width:0.42rem;height:0.42rem;background:url(../images/item-01.png) center center no-repeat;background-size: 100% 100%;margin-top: 0.2rem;}
+.item-content-list span{font-size: 0.32rem; line-height: 0.82rem;color: #000000;width: 31%;overflow: hidden;height: 0.82rem;}
+.item-content-list label{position:absolute;right:0.27rem;width: 0.4rem;height: 0.4rem;margin-top: 0.2rem;}
+.item-content-list label input{position: absolute;left:0;top:0;bottom: 0;right:0;width: 100%;height: 100%;opacity: 0;}
+.item-content-list label i{display: block;width: 100%;height: 100%;background:url(../images/ck_no.png);background-size: 100% 100%;}
+.item-content-list label input:checked + i{background: url(../images/ck_ok.png);background-size: 100% 100%;}
+.item-btn{text-align: center;position: absolute;bottom:0;left:0;right:0;width: 100%;background:#fff;padding: 0.32rem 0;border-top: 1px solid #ddd;z-index: 11;}
+.item-btn button{width:3rem; height: 0.8rem;border-radius: 0.15rem;color: #fff;font-size: 0.36rem;border:none;}
+.btn-f {background: #5fd187;}
+.btn-t {background: #0094ff;}
+.item-content-list ul{margin-left: 0.32rem;width: 100%;padding-right: 0.32rem;overflow:hidden;}
+.item-content-list li{width: 100%;border-top:1px solid #eee;position: relative;transition: .5s;}
+.item-content-list li span{width: 44%;}
+.item-content-list li b{width: 12%;height:0.5rem;background:#0094ff;color:#fff;text-align: center;line-height: 0.5rem;margin-top:0.15rem;border-radius:0.05rem;overflow: hidden;}
+.item-content-list li strong{position: absolute;top:0;right:-1.82rem;height: 100%;width: 1.5rem;text-align: center;background:#DE5145;line-height: 0.85rem;color:#fff;font-size: 0.3rem;}
+
+
+/*test-items*/
+.test-items-content{width: 100%;height: auto;margin-top: 1.16rem;}
+.test-items-top {width: 100%;height: 0.84rem;background: #f0f0f0;}
+.test-items-top p{padding-left: 0.28rem;line-height: 0.84rem;font-size: 0.32rem;}
+.test-items-middle {width: 100%;height:5.42rem;position:relative;text-align: center;}
+// .test-items-text{padding-top: 0.11rem;}
+.test-items-middle input{width: 6.65rem;height: 0.85rem;border: 0.01rem solid #ddd;border-radius: 0.1rem;margin-top: 0.18rem;}
+.test-items-btn{text-align: center;height: 1.39rem;}
+.test-items-btn button{width: 6.65rem;height: 0.85rem;font-size: 0.36rem;color: #fff;background: #0094FF;border-radius: 0.15rem;margin-top: 0.24rem;border:none;}
+

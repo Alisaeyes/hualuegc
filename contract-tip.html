@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title></title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/message_detail.css">
+    <script src="js/rem.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='message.html'"></span><em></em>
+    </div>
+</div>
+<section class="message_detail">     
+    <div class="tipContainer">
+        <!-- <a href="#" class="item">
+            <div class="time">今天18:00</div>
+            <div class="cxt_page">
+                <div class="cxt_box"></div>
+                <h2>合同名称</h2>
+                <p>相关合同内容</p>
+            </div>
+        </a> -->
+        <!-- <div class="empty">
+           <img src="./images/empty.png" alt="">
+           <p></p>
+       </div> -->    
+    </div>
+</section>
+
+
+<script>
+    var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+
+    var classId = getUrlValue("classId");
+    var title = decodeURIComponent(getUrlValue("title"));
+    $(".header_content_top em").text(title);
+
+    if(classId){
+        layer.open({
+            type: 2,
+            shadeClose: false,
+        });
+        $.ajax({
+            url: baseUrl+'/api/program/getInfomation',
+            type: 'POST',
+            dataType: 'json',
+            data: "data="+JSON.stringify({"userId": Stor.getItem("user_id")}),
+        })
+        .done(function(data) {
+            layer.closeAll();
+            if(data.result.programInfo.length<1){
+                $(".tipContainer").html('<div class="empty"><img src="./images/empty.png" alt=""><p>这里什么都没有哦</p>')
+                return false;
+            };
+            var html = "";
+            data.result.programInfo.forEach( function(value, index) {
+                if(classId==value.infotype){
+                    html += '<a href="message_detail.html?nid='+value.nid+'&proid='+value.proid+'&classId='+classId+'&title='+title+'&pageName='+value.pname+'" class="item">'+
+                            '<div class="time">'+(formatDate(value.update_time))+'</div>'+
+                            '<div class="cxt_page">'+
+                                '<div class="cxt_box"></div>'+
+                                '<h2 class="clearfix"><span class="fl">'+value.pname+'</span><span class="fr">'+value.author+'</span></h2>'+
+                                '<p>'+(value.backinfo?value.backinfo:"暂无备注信息")+'</p>'+
+                            '</div>'+
+                        '</a>';
+                }
+            })
+            $(".tipContainer").html(html);
+        })
+        .fail(function() {
+            layer.closeAll();
+            tip("请求出错");
+        })    
+    }else{
+       $(".tipContainer").html('<div class="empty"><img src="./images/empty.png" alt=""><p>这里什么都没有哦</p>') 
+    }
+</script>
+</body>
+</html>

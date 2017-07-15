@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/doc.css">
+    <script src="js/rem.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='index.html'"></span><em>文档样式</em><i>关闭</i>
+    </div>
+</div>
+<section  class="doc_form">
+    <form action="">
+        <div class="doc_01">
+            <span>请假类型</span>
+            <input type="text" value="年假">
+            <em></em>
+        </div>
+        <div class="doc_01">
+            <span>开始时间</span>
+            <input type="text" value="2017-5-15 上午">
+            <em></em>
+        </div>
+        <div class="doc_01">
+            <span>结束时间</span>
+            <input type="text" value="请选择（必填）">
+            <em></em>
+        </div>
+        <div class="doc_01 border_bottom">
+            <span>时长（天）</span>
+            <input type="text" placeholder="请输入时长（必填）" class="txtcenter">
+        </div>
+
+        <div class="doc_02">时长讲自动计入考勤统计</div>
+
+        <div class="doc_01 doc_03 border_bottom">
+            <span>请假事由</span>
+            <input type="text" placeholder="请输入请假事由（必填）" class="txtcenter">
+        </div>
+
+        <div class="doc_04">+增加明细</div>
+
+        <div class="doc_01 border_bottom mt">
+            <span>图片</span>
+            <i class="i1"></i>
+        </div>
+        <div class="doc_01 border_bottom mt">
+            <span>附件</span>
+            <i class="i2"></i>
+        </div>
+        <div class="doc_01 doc_03 mt">
+            <span>附件</span>
+            <i class="i3"></i>
+            <ul class="approve_man clear">
+                <li>
+                    <img src="images/user_name_10.png" alt="">
+                    <p>王静初</p>
+                </li>
+                <li>
+                    <img src="images/user_name_12.png" alt="">
+                    <p>陈浩</p>
+                </li>
+            </ul>
+        </div>
+        <div class="doc_02">点击头像可<span>删除</span></div>
+        <div class="doc_05">
+            <input type="submit" class="sub_detail" value="提交">
+        </div>
+    </form>
+</section>
+
+</body>
+</html>

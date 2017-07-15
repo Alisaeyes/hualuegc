@@ -1,0 +1,27 @@
+
+
+.header_sign_bottom{display:block;height: 1.4rem;width: 100%;background:#4e8ad2;}
+.header_sign_bottom_content{width: 7.2rem;height: 1.4rem;vertical-align: middle;display:table-cell; color: #fff; padding-left: 0.36rem; position: relative;}
+.header_sign_bottom_content h3{font-size: 0.32rem;margin-top: 0.26rem;line-height: 1;}
+.header_sign_bottom_content p{font-size: 0.28rem;line-height:0.6rem;}
+.header_sign_bottom_content p em{font-size: 0.24rem;margin-left: 0.08rem;}
+.header_sign_bottom_content i{width: 0.66rem;height: 100%;background: url("../images/sign_03.png")no-repeat 0 center;background-size: 100% auto;position: absolute;right: 0.3rem;top:0;}
+.left_line { width: 0.01rem; height: 100%; background: #dddddd; position: fixed; left: 0.48rem; top: 0; z-index: -3; }
+.middle_sign { padding-left: 0.29rem; margin-top: 0.39rem; }
+.middle_sign_content { padding-top: 0.2rem; }
+
+.sign { width: 5.73rem; padding: 0.2rem 0.24rem 0.12rem; color: #fff; background: #4ab3ff; border-radius: 0.16rem; position: relative; margin-left: 0.56rem; }
+.sign h3 { font-size: 0.6rem; line-height: 1; margin-bottom: 0.08rem; }
+.sign h3 small { font-size: 0.24rem; color: #a0dcff; margin-left: 0.24rem; }
+.sign p { font-size: 0.24rem; line-height: 0.36rem; }
+.sign:before { content: ""; width: 0.18rem; height: 0.18rem; border-radius: 50%; background: #4ab3ff; position: absolute; left: -0.46rem; top: 50%; margin-top: -0.1rem; z-index: 2; }
+
+.sign_notes { position: fixed; width: 100%; left: 0; bottom: 0.86rem; text-align: center; }
+.sign_notes_top { width: 2.7rem; height: 2.7rem; display: inline-block; vertical-align: top; border-radius: 50%; border: 0.1rem solid #cceaff; background: #4ab3ff; }
+.sign_notes_top p { width: 2.5rem; height: 2.5rem; display: table-cell; vertical-align: middle; text-align: center; line-height: 1; color: #fff; }
+.sign_notes_top p span { font-size: 0.4rem; }
+.sign_notes_top p em { font-size: 0.36rem; margin-top: 0.38rem; display: block; }
+.sign_notes_bottom { margin-top: 0.26rem; line-height: 1; }
+.sign_notes_bottom span { display: inline-block; margin-right: 0.1rem; width: 0.32rem; height:0.32rem ; background: url(../images/daka_11.png) no-repeat; background-size: 100% 100%; vertical-align: middle;}
+.sign_notes_bottom em{font-size: 0.25rem;}
+.sign_notes_bottom i { color: #4ab3ff; }

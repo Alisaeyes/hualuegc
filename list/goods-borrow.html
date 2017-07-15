@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>物品借用</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/doc.css">
+    <link rel="stylesheet" href="../css/list.css">
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/layer.js"></script>
+    <script src="../js/rem.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/index.js"></script>
+</head>
+<body>
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='goods-list.html'"></span><em>物品借用</em><i>关闭</i>
+    </div>
+</div>
+<section class="section_message">
+  <!--   <section class="good-item">
+   <input type="checkbox" for="good-id" value="good-id">
+   <span id="good-id" class="good-name">测试物品</span>
+   <span class="num-choose num-btn">借用</span>
+   </section> -->
+
+
+    <div class="doc_05 btn-mt">
+            <input type="button" class="sub_detail" value="借用"  id="submit_btn">
+    </div>
+</section>
+
+
+<script>
+    var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+    var item = "";
+    layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+
+    $.ajax({
+        url:baseUrl+"/api/asset/getassets",
+        type:"post",
+        dataType:"json",
+        data:"data=",
+        success:function(data){
+            layer.closeAll();
+            console.log(data);
+            data.result.forEach( function(value, index) {
+                item +='<section class="good-item"> <input type="checkbox" for="good-id" value='+value.id+'>';
+                item+=' <span id="good-id" class="good-name">'+value.name+'<small>(数量'+value.num+')</small></span>';
+                item+=' <span class="num-choose num-btn">数量</span></section>';
+            });
+            $(".section_message").prepend(item);
+        },
+        error:function(){
+            layer.closeAll();
+            layer.open({
+                content:"网络错误",
+                style: 'width:50%;background:rgba(0,0,0,.6);color:#fff;',
+                shade:false,
+                time:0.8
+            });
+        }
+    })
+
+/*选择数量*/
+    $(document).on('click',".num-btn", function(event) {
+        var self = $(this);
+          layer.open({
+            content: '<label >输入数量：</label><input type="text" class="input-num" />'
+            ,btn: ['确认', '取消']
+            ,yes: function(){
+                self.text(Math.ceil($(".input-num").val()));
+                layer.closeAll();
+            }
+            ,no:function(){
+                layer.closeAll();
+            }
+          })
+    });
+
+/*提交数据*/
+var  check_num = 0;
+ $(document).on('click',"#submit_btn", function(event) {
+    var elems = $(".section_message input[type=checkbox]:checked");
+    var assetid    = [],
+          data     = "",
+          num      = [];
+        elems.each( function() {       
+            var sib_num = $(this).siblings('.num-btn').text();
+             if(isNaN(sib_num) || sib_num==0){
+                     check_num=1
+             }else{
+                    assetid.push($(this).val());
+                    num.push(sib_num); 
+            }         
+        });
+
+    if(check_num){
+        layer.open({
+            content:"要选择数量哦",
+            skin:"msg",
+            time:2
+        })
+        check_num = 0;
+        return false
+    }
+
+   data = {
+        userId : Stor.getItem("user_id"),
+        assetid: assetid,
+        type   : 2,
+        num    : num  
+   }
+   layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+   $.ajax({
+        url:baseUrl+"/api/asset/index",
+        type:"POST",
+        dataType:"json",
+        data:"data="+JSON.stringify(data),
+        success:function(rData){
+            layer.closeAll();
+            console.log(rData);
+        }
+   })
+});
+</script>
+</body>
+</html>

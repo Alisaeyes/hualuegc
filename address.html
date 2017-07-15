@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>联系人</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/address.css">
+    <script src="js/rem.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/conversion.js"></script>
+</head>
+<body>
+<div class="header_address">
+    <div class="header_address_top">
+        <!--<span></span>-->
+        <em>联系人</em>
+        <!--<i>关闭</i>-->
+    </div>
+    <div class="header_address_search">
+        <input type="text" placeholder="搜索" class="list_search">
+        <span class="search_text">搜索：<i></i></span>
+    </div>
+</div>
+<div class="content_address">
+    <div class="letter"></div>
+    <div class="content_list" id="content_list">
+    </div>
+</div>
+<div class="right_address">
+    <span>A</span>
+    <span>B</span>
+    <span>C</span>
+    <span>D</span>
+    <span>E</span>
+    <span>F</span>
+    <span>G</span>
+    <span>H</span>
+    <span>I</span>
+    <span>J</span>
+    <span>K</span>
+    <span>L</span>
+    <span>M</span>
+    <span>N</span>
+    <span>O</span>
+    <span>P</span>
+    <span>Q</span>
+    <span>R</span>
+    <span>S</span>
+    <span>T</span>
+    <span>U</span>
+    <span>V</span>
+    <span>W</span>
+    <span>X</span>
+    <span>Y</span>
+    <span>Z</span>
+</div>
+
+<div class="footer clearfix">
+    <div onclick="location.href='./message.html'">
+            <i class="iconfont">&#xe656;</i>
+            <p>消息</p>
+            <span class="msgTip"></span>
+    </div>
+    <div onclick="location.href='./index.html'">
+            <i class="iconfont">&#xe612;</i>
+            <p>工作</p>
+    </div>
+     <div onclick="location.href='./address.html'"   class="active">
+            <i class="iconfont">&#xe623;</i>
+            <p>通讯录</p>
+    </div>
+    <div onclick="location.href='./mycenter.html'">
+            <i class="iconfont">&#xe653;</i>
+            <p>我的</p>
+    </div>   
+</div>
+
+<script>
+    var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+
+    layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+    $.ajax({
+        url: baseUrl+'/api/member/getMembers',
+        type: 'POST',
+        dataType: 'json',
+        data: "data=''"
+    })
+    .done(function(data) {
+        layer.closeAll();
+        var list_html = "";
+        switch (data.code) {
+            case -99:
+                tip(data.msg)
+                break;
+            case 100:
+                console.log(data.result.member);
+
+                data.result.member.sort(function(a,b){return ucfirst(convertPinyin(a.name)).charAt(0).localeCompare(ucfirst(convertPinyin(b.name)).charAt(0))});
+                data.result.member.forEach( function(value, index) {
+                    list_html += '<a href="address_details.html?userId='+value.id+'" class='+convertPinyin(value.name).substring(0,1)+'><div class="address_list"><div class="address_list_a">'+
+                                        '<img src='+baseUrl+'/uploads/face/'+value.pic+' onerror="javascript:this.src=\'images/user_name_07.png\'" alt="">'+
+                                        '<span>'+value.name+'</span>'+
+                                        '<em>'+value.group_name+'</em></div></div></a>';
+                })
+                $("#content_list").html(list_html);
+                break;
+            default:
+                // statements_def
+                break;
+        }
+    })
+    .fail(function() {
+        layer.closeAll();
+        tip("请求出错");
+    })
+    .always(function(data) {
+        /*搜索*/
+        var search_text = $(".search_text");
+        $(".list_search").on("input propertychange" , function(){
+                var  val = $(this).val();               
+                //输入框样式
+                if(val.length>0){
+                    $(this).css({"background" :"none"});
+                    search_text.find('i').text(val);
+                    search_text.show();
+                }else {
+                    $(this).css({
+                        "background" :"url(../images/user_name_03.png) no-repeat 44% center",
+                        "backgroundSize":"0.22rem 0.25rem"
+                    })
+                    search_text.find('i').text("");
+                    search_text.hide();
+                    /*清空搜索框，重新渲染*/
+                    $.ajax({
+                        url: baseUrl+'/api/member/getMembers',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: "data=''"
+                    })
+                    .done(function(data) {
+                        var _html = "";
+                        switch (data.code) {
+                            case -99:
+                                tip(data.msg)
+                                break;
+                            case 100:
+                                console.log(data.result.member);
+                                 data.result.member.sort(function(a,b){return ucfirst(convertPinyin(a.name)).charAt(0).localeCompare(ucfirst(convertPinyin(b.name)).charAt(0))});
+                                data.result.member.forEach( function(value, index) {
+                                    _html += '<a href="address_details.html?userId='+value.id+'" class='+convertPinyin(value.name).substring(0,1)+'><div class="address_list"><div class="address_list_a">'+
+                                                        '<img src='+baseUrl+'/uploads/face/'+value.pic+' onerror="javascript:this.src=\'images/user_name_07.png\'" alt="">'+
+                                                        '<span>'+value.name+'</span>'+
+                                                        '<em>'+value.group_name+'</em></div></div></a>';
+                                })
+                                $("#content_list").html(_html);
+                                break;
+                            default:
+                                // statements_def
+                                break;
+                        }
+                    })
+                    .fail(function() {
+                        tip("请求出错")
+                    })
+                    .always(function() {
+                        console.log("complete");
+                    });
+                } 
+        });
+        /*点击搜索*/
+        search_text.on('click', function(event) {
+            var text = $(this).find('i').text();
+            $.ajax({
+                url: baseUrl+'/api/member/getMembers',
+                type: 'POST',
+                dataType: 'json',
+                data: "data="+JSON.stringify({key: text})
+            })
+            .done(function(data) {
+                var search_html = "";
+                switch (data.code) {
+                    case -99:
+                        tip(data.msg)
+                        break;
+                    case 100:
+                        console.log(data.result.member);
+                        data.result.member.forEach( function(value, index) {
+                            search_html += '<a href="address_details.html?userId='+value.id+'" class='+convertPinyin(value.name).substring(0,1)+'><div class="address_list"><div class="address_list_a">'+
+                                                '<img src='+baseUrl+'/uploads/face/'+value.pic+' onerror="javascript:this.src=\'images/user_name_07.png\'" alt="">'+
+                                                '<span>'+value.name+'</span>'+
+                                                '<em>'+value.group_name+'</em></div></div></a>';
+                        })
+                        $("#content_list").html(search_html);
+                        break;
+                    default:
+                        // statements_def
+                        break;
+                }
+            })
+            .fail(function() {
+                tip("请求出错")
+            })
+            .always(function() {
+                $(".search_text").hide();
+            });          
+        });
+
+
+        /*点击字母*/
+        $(".right_address span").on("click",function(){
+            $this = $(this);
+            $this.addClass('checked');
+            $this.siblings().removeClass('checked');
+            var ele = $("#content_list").find('.'+$(this).text().toUpperCase());
+            if(ele.length>0){
+                var index = ele.index(),
+                    height = ele.outerHeight(true);
+                $('.content_address').animate({scrollTop: index*height+'px'}, 500)
+            }
+            $(".letter").text($this.text()).fadeIn();
+            setTimeout(function(){
+                $(".letter").fadeOut();
+            },1000);
+        })
+    });
+    
+
+    
+</script>
+</body>
+</html>

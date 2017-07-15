@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 去除苹果手机的默认样式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <!-- 取消设备对手机号进行识别 -->
+    <meta name="format-detection" content="telephone=yes">
+    <meta name="x5-orientation" content="portrait"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <title>Title</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/user-center.css">
+    <script src="js/rem.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/layer.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/index.js"></script>
+    <style>
+        .section img{border-radius: 50%;border:0.04rem solid #fff;}
+        .user_center_a input{padding-right: 0.3rem;}
+    </style>
+</head>
+<body style="background: #fff;">
+<div class="header">
+    <div class="header_content_top">
+        <span onclick="window.location.href='address.html'"></span><em>联系人详情</em>
+    </div>
+</div>
+    <section class="user_center_form user_form">
+        <div class="face"><img src="" alt="" onerror="javascript:this.src='./images/user_name_07.png'"><p class="name"></p></div>
+        <div class="btns">
+            <a class="msgTo" href="">信息</a>
+            <a class="callTo" href="">呼叫</a>
+            <a class="emailTo" href="">邮件</a>
+        </div>
+        <form>
+            <div class="user_center_a group">
+                <span>部门</span>
+                <input type="text" placeholder="" readonly="true"/>
+            </div>
+           <div class="user_center_a nickname">
+                <span>昵称</span>
+                <input type="text" placeholder=""  readonly="true"/>
+            </div>
+            <div class="user_center_a sex">
+                <span>性别</span>
+                <input type="text" placeholder=""  readonly="true"/>
+            </div>
+            <div class="user_center_a call">
+                <span>电话</span>
+                <input type="text" placeholder=""  readonly="true"/>
+            </div>
+            <div class="user_center_a email">
+                <span>邮箱</span>
+                <input type="text" placeholder=""  readonly="true"/>
+            </div>
+            <div class="user_center_a area clearfix">
+                <span>地区</span>
+                <p class="area fr"></p>
+            </div>
+        </form>
+    </section>
+
+    <script>
+    
+    
+    var user_id = Stor.getItem("user_id");
+    !user_id?window.location.href="./login_1.html":0;
+    layer.open({
+        type: 2,
+        shadeClose: false,
+    });
+    $.ajax({
+        url: baseUrl+'/api/member/getinfo',
+        type: 'POST',
+        dataType: 'json',
+        data: "data="+JSON.stringify({userId: getUrlValue("userId")}),
+    })
+    .done(function(data) {
+        layer.closeAll();
+        if(data.code>0){
+            var user = $(".user_center_a");
+            $(".face img").attr("src",baseUrl+'/uploads/face/'+data.result.head_img);
+            $(".face .name").text(data.result.contact);
+            user.eq(0).find('input').val(data.result.groupname);
+            user.eq(1).find('input').val(data.result.nickname);
+            user.eq(2).find('input').val(data.result.sex=="null" || data.result.sex=="" ? "未知" : (data.result.sex==2?"女":"男") );
+            user.eq(3).find('input').val(data.result.mobile);
+            user.eq(4).find('input').val(data.result.account);
+            user.eq(5).find('.area').text(data.result.address);
+
+            deviceTesting(function(){
+                $(".btns").find('.callTo').attr("href","callto:"+data.result.mobile);
+            },function(){
+                 $(".btns").find('.callTo').attr("href","wtai://wp/mc;"+data.result.mobile);
+            });
+            $(".btns").find('.emailTo').attr("href","mailto:"+data.result.account);
+            $(".btns").find('.msgTo').attr("href","sms:"+data.result.mobile);
+            
+        }     
+    })
+    .fail(function() {
+        layer.closeAll();
+        tip("请求出错");
+    })
+    .always(function() {
+        console.log("complete");
+    });
+    
+    
+    </script>
+</body>
+</html>

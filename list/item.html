@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    	<!-- 去除苹果手机的默认样式 -->
+    	<meta name="apple-mobile-web-app-capable" content="yes"/>
+    	<!-- 取消设备对手机号进行识别 -->
+    	<meta name="format-detection" content="telephone=no">
+    	<meta name="x5-orientation" content="portrait"/>
+    	<meta name="screen-orientation" content="portrait"/>
+		<title></title>
+		<link rel="stylesheet" href="../css/base.css" />
+		<link rel="stylesheet" href="../css/reset.css" />
+		<link rel="stylesheet" href="../css/list.css" />
+		<script src="../js/jquery-3.2.1.min.js"></script>
+		<script src="../js/rem.js"></script>
+		<script src="../js/layer.js"></script>
+		<script src="../js/storage.js"></script>
+		<style>
+			.add-datas input{width: 1.5rem;height:0.5rem;text-align: center;margin: 0 0.2rem;}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class="header_content_top">
+                 <span onclick="location.href='project.html'"></span><em>项目一</em><i>关闭</i>
+             </div>
+		</header>
+		<section class="item-content">
+			<div class="item-content-list clearfix item-title">
+				<em class="fl">项目名称</em>
+				<span class="fl">数据状态</span>
+				<span class="fl">操作员</span>
+				<i class="fr"></i>
+			</div>
+			<form action="">
+			</form>
+		</section>
+		<section class="item-btn">
+			<button type="button" class="btn-f">分配</button>
+			<button type="button" class="btn-t">提交</button>
+		</section>
+
+		<script>
+			var s = 0;
+			$(".item-title i").on("click",function(){
+				layer.open({
+                    content: '<div class="add-datas"><input type="number" />行<input type="number">项</div>'
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index){
+                        var h = $(".add-datas input").eq(0).val();
+                        var x = $(".add-datas input").eq(1).val();
+                        var item = "";
+                        var n =0;
+                        for(var i = 0;i<h;i++){
+                        	s += 1;
+                        	for(var k = 0;k<x;k++){
+                        		n=k+1;
+                        		item +='<li class="fl">'+
+										'<span class="fl">1.'+s+'.'+n+'</span>'+
+										'<span class="fl"></span>'+	
+										'<b class="edit-data fr">编辑</b>'+
+										'<strong>删除</strong>'+
+									'</li>';
+                        	};
+                        	$(".item-content form").append(
+                        		'<div class="item-content-list clearfix">'+
+									'<em class="fl">1'+'.'+(s)+'</em>'+
+									'<span class="fl"></span>'+
+									'<span class="fl"></span>'+
+									'<label for="" class="fr">'+
+										'<input type="checkbox" name="checkbox"/>'+
+										'<i></i>'+
+									'</label>'+
+									'<ul class="clearfix">'+
+									item
+									+'</ul>'+
+								'</div>'
+							);
+                        	item = "";
+                        };
+
+                        $(".edit-data").on("click",function(){
+                        	var num = $(this).prev().prev().text();
+                        	location.href = "view-test-items.html?num="+num;
+                        });
+
+                        var l = 0;
+                        var r = 0;
+                        $(".item-content form ul li").on("touchstart",function(e){
+                        	var x = e.targetTouches[0].pageX;
+                        	var self = $(this);
+                        	$(this).on("touchmove.m",function(e){
+                        		var mx = e.targetTouches[0].pageX;
+                        		if(mx<x){
+                        			l = mx-x;
+                        			self.css({
+                        				transform:"translate3d("+l+"px,0,0)"
+                        			});
+                        			if(l<-self.find("strong").width()/1.5){
+                        				self.css({
+	                        				transform:"translate3d(-1.5rem,0,0)"
+	                        			});
+                        			}
+                        		}else{
+                        			r = mx+x;
+                        			self.css({
+                        				transform:"translate3d("+r+"px,0,0)"
+                        			});
+                        			if(r>-self.find("strong").width()/1.5){
+                        				self.css({
+	                    					transform:"translate3d(0,0,0)"
+	                    				});
+                        			};
+                        		};
+
+                        	});
+                        });
+
+                        $(".item-content form ul li").on("touchend",function(e){
+                        	$(this).off(".touchmove.m");
+                        	if(l<-$(this).find("strong").width()/1.5){
+                				$(this).css({
+                    				transform:"translate3d(-1.5rem,0,0)"
+                    			});
+                			}else if(r>-$(this).find("strong").width()/1.5){
+                				$(this).css({
+                    				transform:"translate3d(0,0,0)"
+                    			});
+                			}
+                			l = 0;
+                			r = 0;
+                        });
+
+	                    $(".item-content form ul li").find("strong").on("click",function(){
+	                    	var ul = $(this).parents("ul");
+	                     	var len = ul.find("li").length;
+	                     	var inx = $(this).parent().index()+1;
+	                     	for(var i = inx;i<len;i++){
+	                     		ul.find("li").eq(i).find("span").eq(0).text(ul.siblings('em').text()+"."+(i));
+	                     	};
+	                     	$(this).parent().remove();
+	                    });
+
+                        layer.close(index);
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>
